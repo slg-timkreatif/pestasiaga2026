@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Score - Pesta Siaga</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏆</text></svg>">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body { font-family: 'Roboto', sans-serif; background-color: #0f172a; color: white; overflow: hidden; }
+        .font-display { font-family: 'Chakra Petch', sans-serif; }
+        
+        /* Animasi Tabel Masuk */
+        .row-anim { animation: slideIn 0.5s ease-out forwards; opacity: 0; transform: translateX(-20px); }
+        @keyframes slideIn { to { opacity: 1; transform: translateX(0); } }
+        
+        /* Glass Effect */
+        .glass-panel { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
+    </style>
+</head>
+<body class="h-screen flex flex-col">
+
+    <script>
+        const API_URL = "https://script.google.com/macros/s/AKfycbyfB19FroqDqmvn7JfSjxNQ03NzPB6_dgajXxGms_bwD51-Crhet615fcWG3xJVC4Uv/exec";
+        const REFRESH_RATE = 15; // Detik
+    </script>
+
+    <header class="h-20 bg-slate-900 border-b border-slate-700 flex justify-between items-center px-8 shadow-2xl z-50">
+        <div class="flex items-center gap-4">
+            <div class="bg-yellow-500 p-2 rounded-lg text-slate-900 shadow-lg shadow-yellow-500/50">
+                <i data-lucide="tent" class="w-8 h-8"></i>
+            </div>
+            <div>
+                <h1 class="text-2xl font-bold font-display tracking-wider text-white">LIVE SCOREBOARD</h1>
+                <p class="text-xs text-slate-400 tracking-widest uppercase">Pesta Siaga Kwartir Ranting Selogiri</p>
+            </div>
+        </div>
+        <div class="text-right">
+            <div id="clock" class="text-2xl font-mono font-bold text-yellow-400">00:00</div>
+            <div class="text-[10px] text-slate-500 uppercase">Update dalam <span id="timer">15</span>s</div>
+        </div>
+    </header>
+
+    <main class="flex-1 flex overflow-hidden">
+        
+        <section class="w-1/2 border-r border-slate-700 flex flex-col relative bg-gradient-to-br from-slate-900 to-slate-800">
+            <div class="p-4 bg-slate-800/80 border-b border-slate-700 flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <span class="bg-blue-600 text-white p-1 rounded"><i data-lucide="user" class="w-6 h-6"></i></span>
+                    <h2 class="text-2xl font-bold font-display text-blue-400">PUTRA</h2>
+                </div>
+                <i data-lucide="bar-chart-2" class="text-slate-600 w-6 h-6"></i>
+            </div>
+            
+            <div class="flex-1 overflow-hidden p-4">
+                <table class="w-full text-left border-collapse">
+                    <thead class="text-slate-500 uppercase text-xs border-b border-slate-700">
+                        <tr>
+                            <th class="p-3 w-16 text-center">#</th>
+                            <th class="p-3">Barung / Pangkalan</th>
+                            <th class="p-3 text-right">Total Nilai</th>
+                        </tr>
+                    </thead>
+                    <tbody id="listPutra" class="text-sm font-medium text-slate-300">
+                        </tbody>
+                </table>
+            </div>
+            <div class="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-blue-900/20 to-transparent pointer-events-none"></div>
+        </section>
+
+        <section class="w-1/2 flex flex-col relative bg-gradient-to-bl from-slate-900 to-slate-800">
+            <div class="p-4 bg-slate-800/80 border-b border-slate-700 flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <span class="bg-red-600 text-white p-1 rounded"><i data-lucide="user-check" class="w-6 h-6"></i></span>
+                    <h2 class="text-2xl font-bold font-display text-red-400">PUTRI</h2>
+                </div>
+                <i data-lucide="bar-chart-2" class="text-slate-600 w-6 h-6"></i>
+            </div>
+
+            <div class="flex-1 overflow-hidden p-4">
+                <table class="w-full text-left border-collapse">
+                    <thead class="text-slate-500 uppercase text-xs border-b border-slate-700">
+                        <tr>
+                            <th class="p-3 w-16 text-center">#</th>
+                            <th class="p-3">Barung / Pangkalan</th>
+                            <th class="p-3 text-right">Total Nilai</th>
+                        </tr>
+                    </thead>
+                    <tbody id="listPutri" class="text-sm font-medium text-slate-300">
+                        </tbody>
+                </table>
+            </div>
+            <div class="absolute bottom-0 right-0 w-full h-32 bg-gradient-to-t from-red-900/20 to-transparent pointer-events-none"></div>
+        </section>
+
+    </main>
+    
+    <footer class="bg-slate-950 text-slate-400 text-sm py-2 overflow-hidden whitespace-nowrap border-t border-slate-800">
+        <div class="animate-marquee inline-block">
+            Selamat Datang di Pesta Siaga Kwarran Selogiri Tahun 2026 • Junjung Tinggi Sportivitas • Santun, Cerdas, Ceria • Pantau terus perolehan nilai secara real-time •
+        </div>
+    </footer>
+
+    <style>
+        .animate-marquee { animation: marquee 20s linear infinite; }
+        @keyframes marquee { 0% { transform: translateX(100vw); } 100% { transform: translateX(-100%); } }
+    </style>
+
+    <script>
+        lucide.createIcons();
+        
+        let masterBarung = [];
+        let countdown = REFRESH_RATE;
+
+        // Jam Digital
+        setInterval(() => {
+            const now = new Date();
+            document.getElementById('clock').innerText = now.toLocaleTimeString('en-GB', {hour: '2-digit', minute:'2-digit'});
+        }, 1000);
+
+        // Timer Mundur
+        setInterval(() => {
+            countdown--;
+            document.getElementById('timer').innerText = countdown;
+            if(countdown <= 0) {
+                fetchData();
+                countdown = REFRESH_RATE;
+            }
+        }, 1000);
+
+        window.onload = fetchData;
+
+        // --- HELPER SAKTI ---
+        function getSafeGender(namaBarung) {
+            let info = masterBarung.find(b => b[1] == namaBarung);
+            if (info && info[3]) return String(info[3]);
+            return "?";
+        }
+
+        async function fetchData() {
+            try {
+                // 1. Ambil Master (Sekali saja kalau kosong, atau update berkala)
+                if(masterBarung.length === 0) {
+                    const resM = await fetch(API_URL + "?action=getData");
+                    const jsonM = await resM.json();
+                    if(jsonM.status === "success") masterBarung = jsonM.data.barung;
+                }
+
+                // 2. Ambil Klasemen Live
+                const res = await fetch(API_URL + "?action=getKlasemen");
+                const json = await res.json();
+                
+                if(json.status === "success") {
+                    processData(json.data);
+                }
+
+            } catch(e) { console.error("Sync Error:", e); }
+        }
+
+        function processData(data) {
+            let putra = [];
+            let putri = [];
+
+            data.forEach(row => {
+                let gender = getSafeGender(row[0]);
+                if(gender.toLowerCase().includes("putra")) putra.push(row);
+                else if(gender.toLowerCase().includes("putri")) putri.push(row);
+            });
+
+            // Tampilkan Top 12 (agar muat di layar)
+            renderList("listPutra", putra.slice(0, 12), "blue");
+            renderList("listPutri", putri.slice(0, 12), "red");
+        }
+
+        function renderList(elementId, data, color) {
+            const tbody = document.getElementById(elementId);
+            tbody.innerHTML = "";
+
+            if(data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="3" class="p-8 text-center text-slate-600">Menunggu Data...</td></tr>`;
+                return;
+            }
+
+            data.forEach((row, index) => {
+                // Style Juara 1, 2, 3 berbeda
+                let rankClass = "text-slate-400";
+                let rowBg = "";
+                let scoreColor = "text-white";
+                
+                if(index === 0) { // Juara 1
+                    rankClass = "text-yellow-400 font-bold text-lg";
+                    rowBg = `bg-${color}-900/30 border-l-4 border-yellow-400`;
+                    scoreColor = "text-yellow-400";
+                } else if(index === 1) { // Juara 2
+                    rankClass = "text-slate-300 font-bold";
+                    rowBg = "bg-slate-800/50";
+                } else if(index === 2) { // Juara 3
+                    rankClass = "text-orange-300 font-bold";
+                    rowBg = "bg-slate-800/30";
+                }
+
+                // Animasi delay per baris
+                let delay = index * 0.05;
+
+                tbody.innerHTML += `
+                    <tr class="border-b border-slate-800 ${rowBg} row-anim" style="animation-delay: ${delay}s">
+                        <td class="p-3 text-center ${rankClass}">${index + 1}</td>
+                        <td class="p-3">
+                            <div class="font-bold text-base tracking-wide">${row[0]}</div>
+                            <div class="text-xs text-slate-500 uppercase">${row[1]}</div>
+                        </td>
+                        <td class="p-3 text-right font-display font-bold text-xl ${scoreColor}">${row[2]}</td>
+                    </tr>
+                `;
+            });
+        }
+    </script>
+</body>
+</html>
