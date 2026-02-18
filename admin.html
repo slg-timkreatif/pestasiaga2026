@@ -8,29 +8,23 @@
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
     <style>
         body { -webkit-tap-highlight-color: transparent; }
+        .swal2-popup { font-family: sans-serif; border-radius: 1rem; }
+        .hidden { display: none !important; }
         
-        /* TAMPILAN KHUSUS CETAK (PRINT) */
+        /* CSS CETAK */
         @media print {
-            .no-print, nav, #loginOverlay, .tab-menu { display: none !important; }
+            .no-print, nav, #loginOverlay, .tab-menu, .swal2-container { display: none !important; }
             #printArea { display: block !important; position: absolute; top: 0; left: 0; width: 100%; background: white; color: black; }
             body { background: white; padding: 0; margin: 0; }
-            
-            /* Reset Table Style for Print */
             table { width: 100%; border-collapse: collapse; border: 1px solid black; }
-            th, td { border: 1px solid black; padding: 4px; text-align: left; font-size: 11px; } /* Font diperkecil biar muat */
+            th, td { border: 1px solid black; padding: 4px; text-align: left; font-size: 11px; } 
             th { background-color: #f0f0f0 !important; -webkit-print-color-adjust: exact; text-align: center; font-weight: bold; }
-            
-            .text-right { text-align: right; }
-            .text-center { text-align: center; }
-            .kop-surat { text-align: center; margin-bottom: 10px; border-bottom: 3px double black; padding-bottom: 5px; }
-            
-            /* Force Landscape untuk Tabel Lebar */
             @page { size: landscape; margin: 10mm; }
         }
-        
         #printArea { display: none; }
     </style>
 </head>
@@ -48,7 +42,7 @@
             <h2 class="text-xl font-bold mb-1">Admin Kwarran</h2>
             <p class="text-sm text-slate-500 mb-6">Panel Kontrol Data Lomba</p>
             <input type="password" id="adminPass" class="w-full p-3 border rounded-lg mb-4 text-center font-bold tracking-widest outline-none focus:ring-2 focus:ring-red-500" placeholder="PASSWORD">
-            <button onclick="checkLogin()" class="w-full bg-red-700 hover:bg-red-800 text-white py-3 rounded-lg font-bold transition">MASUK</button>
+            <button id="btnLoginBtn" class="w-full bg-red-700 hover:bg-red-800 text-white py-3 rounded-lg font-bold transition">MASUK</button>
         </div>
     </div>
 
@@ -58,29 +52,19 @@
                 <i data-lucide="shield" class="w-6 h-6 text-red-600"></i> Admin<span class="text-red-600">Kwarran</span>
             </div>
             <div class="flex gap-2">
-                <button onclick="loadAllData()" class="p-2 bg-slate-100 rounded-lg hover:bg-slate-200" title="Refresh Data">
-                    <i data-lucide="refresh-cw" class="w-5 h-5 text-slate-600"></i>
-                </button>
-                <button onclick="logout()" class="p-2 bg-red-50 rounded-lg hover:bg-red-100 text-red-600" title="Keluar">
-                    <i data-lucide="log-out" class="w-5 h-5"></i>
-                </button>
+                <button id="btnRefresh" class="p-2 bg-slate-100 rounded-lg hover:bg-slate-200" title="Refresh"><i data-lucide="refresh-cw" class="w-5 h-5 text-slate-600"></i></button>
+                <button id="btnLogout" class="p-2 bg-red-50 rounded-lg hover:bg-red-100 text-red-600" title="Keluar"><i data-lucide="log-out" class="w-5 h-5"></i></button>
             </div>
         </div>
     </nav>
 
     <main class="max-w-6xl mx-auto p-4 pb-20 space-y-6 no-print">
-
         <div class="flex p-1 bg-slate-200 rounded-xl tab-menu max-w-md mx-auto">
-            <button onclick="switchTab('monitor')" id="btn-monitor" class="flex-1 py-2 px-4 rounded-lg font-bold text-sm bg-white shadow-sm text-red-600 transition">
-                📡 Monitor Live
-            </button>
-            <button onclick="switchTab('laporan')" id="btn-laporan" class="flex-1 py-2 px-4 rounded-lg font-bold text-sm text-slate-500 hover:text-slate-700 transition">
-                🖨️ Cetak Laporan
-            </button>
+            <button onclick="switchTab('monitor')" id="btn-monitor" class="flex-1 py-2 px-4 rounded-lg font-bold text-sm bg-white shadow-sm text-red-600 transition">📡 Monitor Live</button>
+            <button onclick="switchTab('laporan')" id="btn-laporan" class="flex-1 py-2 px-4 rounded-lg font-bold text-sm text-slate-500 hover:text-slate-700 transition">🖨️ Laporan & Excel</button>
         </div>
 
         <div id="tab-monitor" class="space-y-6 animate-fade-in">
-            
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
                     <div class="text-xs font-bold text-slate-400 uppercase mb-1">Total Input</div>
@@ -105,114 +89,73 @@
                         <h3 class="font-bold flex items-center gap-2"><i data-lucide="user"></i> PUTRA</h3>
                         <span class="text-xs bg-slate-700 px-2 py-1 rounded">Top 5 Live</span>
                     </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-sm text-left">
-                            <thead class="bg-slate-50 text-slate-500 border-b">
-                                <tr>
-                                    <th class="p-3 w-10 text-center">#</th>
-                                    <th class="p-3">Barung</th>
-                                    <th class="p-3 text-right">Nilai</th>
-                                </tr>
-                            </thead>
-                            <tbody id="livePutra" class="divide-y divide-slate-100">
-                                <tr><td colspan="3" class="p-4 text-center text-slate-400">Memuat data...</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
+                    <div class="overflow-x-auto"><table class="w-full text-sm text-left"><tbody id="livePutra" class="divide-y divide-slate-100"></tbody></table></div>
                 </div>
-
                 <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
                     <div class="bg-red-700 text-white p-3 flex justify-between items-center">
                         <h3 class="font-bold flex items-center gap-2"><i data-lucide="user-check"></i> PUTRI</h3>
                         <span class="text-xs bg-red-800 px-2 py-1 rounded">Top 5 Live</span>
                     </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-sm text-left">
-                            <thead class="bg-slate-50 text-slate-500 border-b">
-                                <tr>
-                                    <th class="p-3 w-10 text-center">#</th>
-                                    <th class="p-3">Barung</th>
-                                    <th class="p-3 text-right">Nilai</th>
-                                </tr>
-                            </thead>
-                            <tbody id="livePutri" class="divide-y divide-slate-100">
-                                <tr><td colspan="3" class="p-4 text-center text-slate-400">Memuat data...</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
+                    <div class="overflow-x-auto"><table class="w-full text-sm text-left"><tbody id="livePutri" class="divide-y divide-slate-100"></tbody></table></div>
                 </div>
             </div>
 
             <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
                 <div class="p-4 border-b bg-slate-50 flex justify-between items-center">
                     <h3 class="font-bold flex items-center gap-2"><i data-lucide="list"></i> Log Input Terakhir</h3>
-                    <span class="text-xs text-slate-400">Real-time</span>
                 </div>
                 <div id="logList" class="divide-y divide-slate-100 max-h-[400px] overflow-y-auto"></div>
             </div>
-
+            
             <div class="mt-8 pt-6 border-t border-slate-300 text-center">
-                <button onclick="resetAllData()" class="text-red-500 text-xs font-bold hover:text-red-700 flex items-center justify-center gap-1 mx-auto bg-red-50 px-4 py-2 rounded-full border border-red-100">
-                    <i data-lucide="trash-2" class="w-3 h-3"></i> RESET DATA LOMBA
-                </button>
+                <button onclick="resetAllData()" class="text-red-500 text-xs font-bold hover:text-red-700 flex items-center justify-center gap-1 mx-auto bg-red-50 px-4 py-2 rounded-full border border-red-100"><i data-lucide="trash-2" class="w-3 h-3"></i> RESET DATA LOMBA</button>
             </div>
         </div>
 
         <div id="tab-laporan" class="space-y-6 hidden animate-fade-in">
-            
             <div class="bg-white p-5 rounded-xl shadow-sm border border-purple-200 bg-purple-50">
                 <div class="flex items-center gap-3 mb-4">
                     <div class="bg-purple-200 p-2 rounded-lg"><i data-lucide="table" class="w-6 h-6 text-purple-700"></i></div>
                     <div>
-                        <h3 class="font-bold text-lg text-purple-900">Matriks Rekapitulasi (Lengkap)</h3>
-                        <p class="text-xs text-purple-600">Tabel seluruh nilai peserta di semua mata lomba (Landscape).</p>
+                        <h3 class="font-bold text-lg text-purple-900">Matriks Rekapitulasi</h3>
+                        <p class="text-xs text-purple-600">Download Excel / Cetak</p>
                     </div>
                 </div>
-                <div class="grid grid-cols-2 gap-3">
-                    <button onclick="printRekapMatriks('Putra')" class="bg-purple-700 text-white py-3 rounded-lg font-bold hover:bg-purple-800 flex justify-center items-center gap-2 shadow-lg shadow-purple-200 transition transform active:scale-95">
-                        <i data-lucide="printer" class="w-4 h-4"></i> REKAP PUTRA
-                    </button>
-                    <button onclick="printRekapMatriks('Putri')" class="bg-purple-700 text-white py-3 rounded-lg font-bold hover:bg-purple-800 flex justify-center items-center gap-2 shadow-lg shadow-purple-200 transition transform active:scale-95">
-                        <i data-lucide="printer" class="w-4 h-4"></i> REKAP PUTRI
-                    </button>
+                <div class="space-y-2">
+                    <div class="flex gap-2 items-center">
+                        <span class="text-xs font-bold w-12 text-slate-500">PUTRA:</span>
+                        <button onclick="processRekap('Putra', 'print')" class="flex-1 bg-purple-700 text-white py-2 rounded-lg font-bold hover:bg-purple-800 flex items-center justify-center gap-2 text-xs"><i data-lucide="printer" class="w-3 h-3"></i> PDF</button>
+                        <button onclick="processRekap('Putra', 'excel')" class="flex-1 bg-green-600 text-white py-2 rounded-lg font-bold hover:bg-green-700 flex items-center justify-center gap-2 text-xs"><i data-lucide="file-spreadsheet" class="w-3 h-3"></i> Excel</button>
+                    </div>
+                    <div class="flex gap-2 items-center">
+                        <span class="text-xs font-bold w-12 text-slate-500">PUTRI:</span>
+                        <button onclick="processRekap('Putri', 'print')" class="flex-1 bg-purple-700 text-white py-2 rounded-lg font-bold hover:bg-purple-800 flex items-center justify-center gap-2 text-xs"><i data-lucide="printer" class="w-3 h-3"></i> PDF</button>
+                        <button onclick="processRekap('Putri', 'excel')" class="flex-1 bg-green-600 text-white py-2 rounded-lg font-bold hover:bg-green-700 flex items-center justify-center gap-2 text-xs"><i data-lucide="file-spreadsheet" class="w-3 h-3"></i> Excel</button>
+                    </div>
                 </div>
             </div>
 
             <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
                 <div class="flex items-center gap-3 mb-4">
                     <div class="bg-yellow-100 p-2 rounded-lg"><i data-lucide="trophy" class="w-6 h-6 text-yellow-600"></i></div>
-                    <div>
-                        <h3 class="font-bold text-lg">Cetak Juara (Klasemen Simple)</h3>
-                        <p class="text-xs text-slate-500">Hanya menampilkan Ranking, Nama, dan Total Nilai.</p>
-                    </div>
+                    <div><h3 class="font-bold text-lg">Cetak Juara</h3></div>
                 </div>
                 <div class="grid grid-cols-2 gap-3">
-                    <button onclick="printKlasemen('Putra')" class="bg-slate-800 text-white py-3 rounded-lg font-bold hover:bg-slate-700 flex justify-center items-center gap-2">
-                        <i data-lucide="printer" class="w-4 h-4"></i> JUARA PUTRA
-                    </button>
-                    <button onclick="printKlasemen('Putri')" class="bg-red-700 text-white py-3 rounded-lg font-bold hover:bg-red-800 flex justify-center items-center gap-2">
-                        <i data-lucide="printer" class="w-4 h-4"></i> JUARA PUTRI
-                    </button>
+                    <button onclick="printKlasemen('Putra')" class="bg-slate-800 text-white py-2 rounded-lg font-bold hover:bg-slate-700 gap-2 flex justify-center items-center text-sm"><i data-lucide="printer" class="w-4 h-4"></i> JUARA PUTRA</button>
+                    <button onclick="printKlasemen('Putri')" class="bg-red-700 text-white py-2 rounded-lg font-bold hover:bg-red-800 gap-2 flex justify-center items-center text-sm"><i data-lucide="printer" class="w-4 h-4"></i> JUARA PUTRI</button>
                 </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
-                    <div class="flex items-center gap-2 mb-2">
-                        <i data-lucide="tent" class="w-5 h-5 text-blue-600"></i>
-                        <h3 class="font-bold text-sm uppercase">Rekap Per Taman</h3>
-                    </div>
+                    <div class="flex items-center gap-2 mb-2"><i data-lucide="tent" class="w-5 h-5 text-blue-600"></i><h3 class="font-bold text-sm uppercase">Rekap Per Taman</h3></div>
                     <div class="flex gap-2">
                         <select id="selectTamanPrint" class="flex-1 p-2 border rounded bg-slate-50 text-xs font-bold"><option value="">Pilih Taman...</option></select>
                         <button onclick="printRekapTaman()" class="bg-blue-600 text-white px-3 rounded hover:bg-blue-700"><i data-lucide="printer" class="w-4 h-4"></i></button>
                     </div>
                 </div>
-
                 <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
-                    <div class="flex items-center gap-2 mb-2">
-                        <i data-lucide="users" class="w-5 h-5 text-green-600"></i>
-                        <h3 class="font-bold text-sm uppercase">Rapor Barung</h3>
-                    </div>
+                    <div class="flex items-center gap-2 mb-2"><i data-lucide="users" class="w-5 h-5 text-green-600"></i><h3 class="font-bold text-sm uppercase">Rapor Barung</h3></div>
                     <div class="flex gap-2">
                         <select id="selectBarungPrint" class="flex-1 p-2 border rounded bg-slate-50 text-xs font-bold"><option value="">Pilih Barung...</option></select>
                         <button onclick="printRaporBarung()" class="bg-green-600 text-white px-3 rounded hover:bg-green-700"><i data-lucide="printer" class="w-4 h-4"></i></button>
@@ -241,288 +184,237 @@
     </div>
 
     <script>
+        // INISIALISASI
         lucide.createIcons();
-        
-        // --- VARIABEL ---
         let PASSWORD = "";
-        let rawData = [];     
-        let masterTaman = []; 
-        let masterBarung = [];
+        let rawData = []; let masterTaman = []; let masterBarung = [];
+
+        // EVENT LISTENER (Agar lebih aman dari error HTML)
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('btnLoginBtn').addEventListener('click', checkLogin);
+            document.getElementById('btnRefresh').addEventListener('click', loadAllData);
+            document.getElementById('btnLogout').addEventListener('click', logout);
+        });
 
         // --- AUTH ---
         function checkLogin() {
             const pass = document.getElementById('adminPass').value;
-            if(!pass) return alert("Masukkan Password!");
+            if(!pass) { Swal.fire('Error', 'Masukkan Password', 'error'); return; }
             PASSWORD = pass;
             document.getElementById('loginOverlay').classList.add('hidden');
             loadAllData();
             setInterval(loadAllData, 30000);
+            Swal.fire({icon:'success', title:'Masuk Berhasil', timer:1000, showConfirmButton:false});
         }
         function logout() { location.reload(); }
 
-        // --- HELPER SAKTI ---
         function getSafeGender(namaBarung) {
             let info = masterBarung.find(b => b[1] == namaBarung);
-            if (info && info[3]) return String(info[3]);
-            return "?"; 
+            return (info && info[3]) ? String(info[3]) : "?"; 
         }
 
-        // --- LOAD DATA ---
+        // --- DATA ---
         async function loadAllData() {
-            document.getElementById('lastUpdate').innerText = "Memuat...";
+            document.getElementById('lastUpdate').innerText = "Loading...";
             try {
-                // 1. Master Data
-                const resMaster = await fetch(API_URL + "?action=getData");
-                const jsonMaster = await resMaster.json();
-                if(jsonMaster.status === "success") {
-                     masterTaman = jsonMaster.data.taman;
-                     masterBarung = jsonMaster.data.barung;
+                // Master
+                const r1 = await fetch(API_URL + "?action=getData");
+                const j1 = await r1.json();
+                if(j1.status === "success") {
+                     masterTaman = j1.data.taman;
+                     masterBarung = j1.data.barung;
                      renderDropdownPrint();
                 }
-
-                // 2. Transaksi
-                const resAdmin = await fetch(API_URL + "?action=getAdminData");
-                const jsonAdmin = await resAdmin.json();
-                if(jsonAdmin.status === "success") {
-                    rawData = jsonAdmin.data; 
+                // Nilai
+                const r2 = await fetch(API_URL + "?action=getAdminData");
+                const j2 = await r2.json();
+                if(j2.status === "success") {
+                    rawData = j2.data; 
                     renderStatsAndLog(rawData);
                 }
-
-                // 3. Klasemen Live
-                const resKlasemen = await fetch(API_URL + "?action=getKlasemen");
-                const jsonKlasemen = await resKlasemen.json();
-                if(jsonKlasemen.status === "success") {
-                    renderLiveKlasemen(jsonKlasemen.data);
-                }
-
-                const now = new Date();
-                document.getElementById('lastUpdate').innerText = now.toLocaleTimeString();
-
-            } catch(e) { console.error("Error loading data", e); }
+                // Klasemen
+                const r3 = await fetch(API_URL + "?action=getKlasemen");
+                const j3 = await r3.json();
+                if(j3.status === "success") renderLiveKlasemen(j3.data);
+                
+                document.getElementById('lastUpdate').innerText = new Date().toLocaleTimeString();
+            } catch(e) { console.error(e); }
         }
 
-        // --- RENDER LOGIC ---
+        // --- RENDER ---
         function renderStatsAndLog(data) {
             document.getElementById('totalData').innerText = data.length;
             let tamanSet = new Set(data.map(r => r[1]));
             document.getElementById('activeTaman').innerText = tamanSet.size;
-
+            
             const list = document.getElementById('logList');
             list.innerHTML = "";
-            let viewData = data.slice().reverse().slice(0, 30); 
-
-            viewData.forEach(row => {
-                let genderStr = getSafeGender(row[2]);
-                let isPutra = genderStr.toLowerCase().includes("putra");
-                let badgeClass = isPutra ? "bg-slate-200 text-slate-700" : (genderStr === "?" ? "bg-gray-100 text-gray-500" : "bg-red-100 text-red-700");
-                let badgeLabel = isPutra ? "PA" : (genderStr === "?" ? "?" : "PI");
-                
-                let item = document.createElement('div');
-                item.className = "p-3 flex justify-between items-center hover:bg-slate-50 border-b border-slate-100";
-                item.innerHTML = `
-                    <div class="flex items-center gap-3">
-                        <span class="${badgeClass} px-2 py-1 rounded text-xs font-bold">${badgeLabel}</span>
-                        <div>
-                            <div class="font-bold text-sm text-slate-800">${row[2]}</div>
-                            <div class="text-xs text-slate-500">${row[1]} • Nilai: <b class="text-blue-600">${row[4]}</b></div>
-                        </div>
+            let view = data.slice().reverse().slice(0, 30);
+            view.forEach(row => {
+                let g = getSafeGender(row[2]);
+                let bg = g.toLowerCase().includes('putra') ? 'bg-slate-200' : 'bg-red-100';
+                list.innerHTML += `<div class="p-3 flex justify-between hover:bg-slate-50 border-b">
+                    <div class="flex gap-3 items-center">
+                        <span class="${bg} px-2 rounded text-xs font-bold">${g.includes('Putra') ? 'PA':'PI'}</span>
+                        <div><div class="font-bold text-sm">${row[2]}</div><div class="text-xs text-slate-500">${row[1]} • Score: ${row[4]}</div></div>
                     </div>
-                    <button onclick="hapusData('${row[5]}')" class="text-slate-300 hover:text-red-500 transition p-2"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-                `;
-                list.appendChild(item);
+                    <button onclick="hapusData('${row[5]}')" class="text-slate-300 hover:text-red-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                </div>`;
             });
             lucide.createIcons();
         }
 
         function renderLiveKlasemen(data) {
-            let putraArr = [];
-            let putriArr = [];
-
-            data.forEach(row => {
-                let genderStr = getSafeGender(row[0]);
-                if(genderStr.toLowerCase().includes("putra")) putraArr.push(row);
-                else if(genderStr.toLowerCase().includes("putri")) putriArr.push(row);
+            let pa = [], pi = [];
+            data.forEach(r => {
+                let g = getSafeGender(r[0]).toLowerCase();
+                if(g.includes('putra')) pa.push(r); else if(g.includes('putri')) pi.push(r);
             });
-
-            renderTable("livePutra", putraArr);
-            renderTable("livePutri", putriArr);
+            fillTable('livePutra', pa); fillTable('livePutri', pi);
         }
 
-        function renderTable(elementId, data) {
-            const tbody = document.getElementById(elementId);
-            tbody.innerHTML = "";
-            let top5 = data.slice(0, 5);
-            if(top5.length === 0) { tbody.innerHTML = `<tr><td colspan="3" class="p-4 text-center text-xs text-slate-400">Belum ada data</td></tr>`; return; }
-            top5.forEach((row, idx) => {
-                tbody.innerHTML += `<tr class="border-b border-slate-50 last:border-0 hover:bg-slate-50"><td class="p-3 text-center font-bold text-slate-400 text-xs">${idx+1}</td><td class="p-3"><div class="font-bold text-sm text-slate-700">${row[0]}</div><div class="text-[10px] text-slate-400">${row[1]}</div></td><td class="p-3 text-right font-bold text-blue-600 text-sm">${row[2]}</td></tr>`;
+        function fillTable(id, data) {
+            let h = "";
+            data.slice(0, 5).forEach((r, i) => {
+                h += `<tr class="border-b"><td class="p-3 text-center font-bold text-xs">${i+1}</td><td class="p-3"><div class="font-bold text-sm">${r[0]}</div><div class="text-[10px] text-slate-400">${r[1]}</div></td><td class="p-3 text-right font-bold text-blue-600 text-sm">${r[2]}</td></tr>`;
             });
+            document.getElementById(id).innerHTML = h || `<tr><td colspan="3" class="p-4 text-center text-xs">Belum ada data</td></tr>`;
         }
 
         function renderDropdownPrint() {
-            let selTaman = document.getElementById('selectTamanPrint');
-            selTaman.innerHTML = '<option value="">Pilih Taman...</option>';
-            masterTaman.forEach(t => {
-                let opt = document.createElement('option'); opt.value = t[1]; opt.text = t[1]; selTaman.appendChild(opt);
-            });
-
-            let selBarung = document.getElementById('selectBarungPrint');
-            selBarung.innerHTML = '<option value="">Pilih Barung...</option>';
-            masterBarung.sort((a,b) => a[1].localeCompare(b[1]));
-            masterBarung.forEach(b => {
-                let opt = document.createElement('option'); opt.value = b[1]; 
-                let g = b[3] ? b[3] : "?"; opt.text = `${b[1]} (${g})`; selBarung.appendChild(opt);
-            });
+            let t = document.getElementById('selectTamanPrint');
+            t.innerHTML = '<option value="">Pilih Taman...</option>';
+            masterTaman.forEach(x => t.innerHTML += `<option value="${x[1]}">${x[1]}</option>`);
+            
+            let b = document.getElementById('selectBarungPrint');
+            b.innerHTML = '<option value="">Pilih Barung...</option>';
+            masterBarung.sort((x,y) => x[1].localeCompare(y[1]));
+            masterBarung.forEach(x => b.innerHTML += `<option value="${x[1]}">${x[1]} (${x[3]||'?'})</option>`);
         }
 
-        // --- PRINT LOGIC ---
-        function preparePrint(title, category) {
+        // --- CORE PROCESS REKAP ---
+        async function processRekap(gender, mode) {
+            const res = await Swal.fire({title:`Rekap ${gender}?`, icon:'question', showCancelButton:true});
+            if(!res.isConfirmed) return;
+
+            let barungs = masterBarung.filter(b => (b[3]||"").toLowerCase().includes(gender.toLowerCase()));
+            if(!barungs.length) { Swal.fire('Kosong', 'Tidak ada data barung', 'warning'); return; }
+            
+            let tamans = masterTaman.map(t => t[1]).sort();
+            
+            // Build Data
+            let finalData = barungs.map(b => {
+                let scores = {};
+                tamans.forEach(t => scores[t] = 0);
+                let total = 0;
+                
+                // Cari nilai barung ini di rawData
+                rawData.forEach(r => {
+                    if(r[2] === b[1]) { // Nama Barung Match
+                        scores[r[1]] = parseInt(r[4]); // r[1]=Taman, r[4]=Nilai
+                    }
+                });
+                
+                // Hitung total manual dari scores yang terkumpul
+                total = Object.values(scores).reduce((a,c) => a+c, 0);
+                
+                return { nama: b[1], pangkalan: b[2], scores: scores, total: total };
+            });
+
+            // Sort Ranking
+            finalData.sort((a,b) => b.total - a.total);
+
+            // Generate HTML
+            let h = `<table border="1" style="border-collapse:collapse;width:100%;font-family:Arial;font-size:12px;">
+                <thead style="background:#ddd;"><tr><th>RANK</th><th>NO</th><th>BARUNG</th><th>PANGKALAN</th>`;
+            tamans.forEach(t => h += `<th>${t}</th>`);
+            h += `<th>TOTAL</th></tr></thead><tbody>`;
+            
+            finalData.forEach((row, i) => {
+                h += `<tr><td style="text-align:center;">${i+1}</td><td style="text-align:center;">${i+1}</td><td>${row.nama}</td><td>${row.pangkalan}</td>`;
+                tamans.forEach(t => h += `<td style="text-align:center;">${row.scores[t]||'-'}</td>`);
+                h += `<td style="text-align:center;font-weight:bold;">${row.total}</td></tr>`;
+            });
+            h += `</tbody></table>`;
+
+            if(mode === 'print') {
+                preparePrint("REKAP NILAI AKHIR", "KATEGORI: " + gender.toUpperCase());
+                document.getElementById('printContent').innerHTML = h;
+                window.print();
+            } else {
+                downloadExcel(h, `Rekap_${gender}.xls`);
+            }
+        }
+
+        function downloadExcel(html, name) {
+            let link = document.createElement('a');
+            link.href = 'data:application/vnd.ms-excel,' + encodeURIComponent(html);
+            link.download = name;
+            link.click();
+        }
+
+        function preparePrint(title, cat) {
             document.getElementById('printTitle').innerText = title;
-            document.getElementById('printCategory').innerText = category;
-            const now = new Date();
-            document.getElementById('printDate').innerText = now.toLocaleString('id-ID');
-            document.getElementById('printDateSign').innerText = now.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            document.getElementById('printCategory').innerText = cat;
+            document.getElementById('printDate').innerText = new Date().toLocaleString();
             document.getElementById('printContent').innerHTML = "";
         }
 
-        // A. MATRIKS REKAPITULASI (BARU & LENGKAP)
-        async function printRekapMatriks(gender) {
-            if(!confirm(`Cetak Matriks Rekapitulasi ${gender}?`)) return;
-            
-            // 1. Siapkan Data
-            let listTaman = masterTaman.map(t => t[1]).sort(); 
-            let listBarung = masterBarung.filter(b => {
-                let g = b[3] ? String(b[3]) : "?";
-                return g.toLowerCase().includes(gender.toLowerCase());
-            });
-
-            if(listBarung.length === 0) return alert("Data Barung kosong.");
-
-            // 2. Mapping Nilai
-            let dataRekap = {};
-            listBarung.forEach(b => {
-                dataRekap[b[1]] = { pangkalan: b[2], nilai: {}, total: 0 };
-                listTaman.forEach(t => dataRekap[b[1]].nilai[t] = 0);
-            });
-
-            rawData.forEach(row => {
-                let nmBarung = row[2]; let nmTaman = row[1]; let skor = parseInt(row[4]);
-                if(dataRekap[nmBarung]) {
-                    // Cek jika data sudah ada sebelumnya (timpa dengan yang baru jika ada revisi?)
-                    // Asumsi: Kita ambil total nilai yang tercatat (Jika ada duplikat seharusnya dihapus admin)
-                    // Disini kita pakai logika: Timpa nilai terakhir.
-                    let oldVal = dataRekap[nmBarung].nilai[nmTaman] || 0;
-                    dataRekap[nmBarung].total = (dataRekap[nmBarung].total - oldVal) + skor;
-                    dataRekap[nmBarung].nilai[nmTaman] = skor;
-                }
-            });
-
-            let arrayRekap = listBarung.map(b => {
-                return { nama: b[1], pangkalan: b[2], detail: dataRekap[b[1]].nilai, total: dataRekap[b[1]].total };
-            });
-
-            // 3. Sort Ranking
-            arrayRekap.sort((a,b) => b.total - a.total);
-
-            // 4. Render HTML
-            preparePrint("REKAPITULASI NILAI AKHIR", "KATEGORI: " + gender.toUpperCase());
-            
-            let html = `<table style="font-size: 11px; width: 100%;">
-                <thead>
-                    <tr>
-                        <th rowspan="2" style="width:30px">RANGKING</th>
-                        <th rowspan="2" style="width:40px">NO</th>
-                        <th rowspan="2">NAMA BARUNG</th>
-                        <th rowspan="2">PANGKALAN</th>
-                        <th colspan="${listTaman.length}">MATA LOMBA (TAMAN)</th>
-                        <th rowspan="2" style="width:50px">TOTAL</th>
-                    </tr>
-                    <tr>${listTaman.map(t => `<th>${t}</th>`).join('')}</tr>
-                </thead>
-                <tbody>`;
-
-            arrayRekap.forEach((row, index) => {
-                html += `<tr>
-                    <td style="text-align:center; font-weight:bold">${index + 1}</td>
-                    <td style="text-align:center">${index + 1}</td>
-                    <td>${row.nama}</td>
-                    <td>${row.pangkalan}</td>
-                    ${listTaman.map(t => `<td style="text-align:center">${row.detail[t] || '-'}</td>`).join('')}
-                    <td style="text-align:center; font-weight:bold; background-color:#eee">${row.total}</td>
-                </tr>`;
-            });
-            html += `</tbody></table>`;
-            
-            document.getElementById('printContent').innerHTML = html;
+        // --- OTHER PRINTS ---
+        async function printKlasemen(g) {
+            if(!confirm("Cetak?")) return;
+            const r = await fetch(API_URL + "?action=getKlasemen");
+            const j = await r.json();
+            let d = j.data.filter(x => getSafeGender(x[0]).toLowerCase().includes(g.toLowerCase()));
+            preparePrint("KLASEMEN", g.toUpperCase());
+            let h = `<table style="width:100%;border:1px solid #000;border-collapse:collapse;"><thead><tr style="background:#eee;"><th>RANK</th><th>BARUNG</th><th>TOTAL</th></tr></thead><tbody>`;
+            d.forEach((x,i) => h += `<tr><td style="text-align:center;border:1px solid #000;">${i+1}</td><td style="border:1px solid #000;">${x[0]}</td><td style="text-align:right;border:1px solid #000;">${x[2]}</td></tr>`);
+            h += `</tbody></table>`;
+            document.getElementById('printContent').innerHTML = h;
             window.print();
         }
 
-        // B. printKlasemen, C. printRekapTaman, D. printRaporBarung (Sama seperti sebelumnya)
-        async function printKlasemen(gender) {
-            if(!confirm(`Cetak Klasemen ${gender}?`)) return;
-            try {
-                const res = await fetch(API_URL + "?action=getKlasemen");
-                const json = await res.json();
-                let filtered = json.data.filter(row => {
-                    let g = getSafeGender(row[0]); return g.toLowerCase().includes(gender.toLowerCase());
-                });
-                if(filtered.length === 0) return alert("Belum ada data.");
-                preparePrint("KLASEMEN AKHIR", "KATEGORI " + gender.toUpperCase());
-                let html = `<table><thead><tr><th style="width:50px">RANGKING</th><th>BARUNG</th><th>PANGKALAN</th><th style="text-align:right">TOTAL NILAI</th></tr></thead><tbody>`;
-                filtered.forEach((row, index) => { html += `<tr><td class="text-center font-bold">${index + 1}</td><td>${row[0]}</td><td>${row[1]}</td><td class="text-right font-bold">${row[2]}</td></tr>`; });
-                html += `</tbody></table>`;
-                document.getElementById('printContent').innerHTML = html;
-                window.print();
-            } catch(e) { alert("Error: " + e); }
-        }
-        
         function printRekapTaman() {
-            let taman = document.getElementById('selectTamanPrint').value;
-            if(!taman) return alert("Pilih Taman!");
-            preparePrint("REKAP NILAI", "POS: " + taman.toUpperCase());
-            let data = rawData.filter(r => r[1] === taman).sort((a,b) => b[4] - a[4]);
-            let html = `<table><thead><tr><th>NO</th><th>BARUNG</th><th>PANGKALAN</th><th>NILAI</th></tr></thead><tbody>`;
-            data.forEach((r, i) => html += `<tr><td class="text-center">${i+1}</td><td>${r[2]}</td><td>${r[3]}</td><td class="text-right font-bold">${r[4]}</td></tr>`);
-            html += `</tbody></table>`;
-            document.getElementById('printContent').innerHTML = html;
+            let t = document.getElementById('selectTamanPrint').value;
+            if(!t) return alert("Pilih Taman");
+            preparePrint("REKAP TAMAN", t);
+            let d = rawData.filter(x => x[1] === t).sort((a,b) => b[4]-a[4]);
+            let h = `<table style="width:100%;border:1px solid #000;border-collapse:collapse;"><thead><tr><th>NO</th><th>BARUNG</th><th>NILAI</th></tr></thead><tbody>`;
+            d.forEach((x,i) => h += `<tr><td style="text-align:center;border:1px solid #000;">${i+1}</td><td style="border:1px solid #000;">${x[2]}</td><td style="border:1px solid #000;">${x[4]}</td></tr>`);
+            h += `</tbody></table>`;
+            document.getElementById('printContent').innerHTML = h;
             window.print();
         }
 
         function printRaporBarung() {
-            let barung = document.getElementById('selectBarungPrint').value;
-            if(!barung) return alert("Pilih Barung!");
-            let info = masterBarung.find(b => b[1] == barung);
-            let gender = info && info[3] ? info[3] : "?"; let sekolah = info ? info[2] : "";
-            preparePrint("RAPOR HASIL LOMBA", `BARUNG: ${barung} (${gender}) - ${sekolah}`);
-            let data = rawData.filter(r => r[2] === barung);
-            let total = 0;
-            let html = `<table><thead><tr><th>NO</th><th>MATA LOMBA</th><th>NILAI</th></tr></thead><tbody>`;
-            data.forEach((r, i) => { total+=parseInt(r[4]); html += `<tr><td class="text-center">${i+1}</td><td>${r[1]}</td><td class="text-right font-bold">${r[4]}</td></tr>`; });
-            html += `<tr><td colspan="2" class="text-right font-bold bg-slate-100">TOTAL</td><td class="text-right font-bold bg-slate-100">${total}</td></tr></tbody></table>`;
-            document.getElementById('printContent').innerHTML = html;
+            let b = document.getElementById('selectBarungPrint').value;
+            if(!b) return alert("Pilih Barung");
+            preparePrint("RAPOR", b);
+            let d = rawData.filter(x => x[2] === b);
+            let h = `<table style="width:100%;border:1px solid #000;border-collapse:collapse;"><thead><tr><th>TAMAN</th><th>NILAI</th></tr></thead><tbody>`;
+            let tot = 0;
+            d.forEach(x => { tot+=parseInt(x[4]); h += `<tr><td style="border:1px solid #000;">${x[1]}</td><td style="border:1px solid #000;">${x[4]}</td></tr>`; });
+            h += `<tr><td><b>TOTAL</b></td><td><b>${tot}</b></td></tr></tbody></table>`;
+            document.getElementById('printContent').innerHTML = h;
             window.print();
         }
 
-        // --- ACTIONS ---
-        function switchTab(tab) {
+        // --- UTILS ---
+        function switchTab(t) {
             document.getElementById('tab-monitor').classList.add('hidden');
             document.getElementById('tab-laporan').classList.add('hidden');
-            document.getElementById('btn-monitor').className = "flex-1 py-2 px-4 rounded-lg font-bold text-sm text-slate-500 hover:text-slate-700 transition";
-            document.getElementById('btn-laporan').className = "flex-1 py-2 px-4 rounded-lg font-bold text-sm text-slate-500 hover:text-slate-700 transition";
-            document.getElementById('tab-' + tab).classList.remove('hidden');
-            document.getElementById('btn-' + tab).className = "flex-1 py-2 px-4 rounded-lg font-bold text-sm bg-white shadow-sm text-red-600 transition";
+            document.getElementById('tab-'+t).classList.remove('hidden');
         }
 
-        async function hapusData(kunci) {
+        async function hapusData(k) {
             if(!confirm("Hapus?")) return;
-            try {
-                await fetch(API_URL, {method: 'POST', mode: 'no-cors', headers: {"Content-Type": "text/plain"}, body: JSON.stringify({action: 'delete', password: PASSWORD, kunci: kunci})});
-                alert("Dihapus."); loadAllData();
-            } catch(e) { alert(e); }
+            await fetch(API_URL, {method:'POST', mode:'no-cors', body:JSON.stringify({action:'delete', password:PASSWORD, kunci:k})});
+            alert("Dihapus"); loadAllData();
         }
 
         async function resetAllData() {
-            if(prompt("Ketik 'RESET' untuk hapus semua:") === "RESET") {
-                await fetch(API_URL, {method: 'POST', mode: 'no-cors', headers: {"Content-Type": "text/plain"}, body: JSON.stringify({action: 'reset', password: PASSWORD})});
+            if(prompt("Ketik RESET") === "RESET") {
+                await fetch(API_URL, {method:'POST', mode:'no-cors', body:JSON.stringify({action:'reset', password:PASSWORD})});
                 location.reload();
             }
         }
