@@ -13,16 +13,12 @@
     <style>
         body { -webkit-tap-highlight-color: transparent; }
         .btn-active:active { transform: scale(0.95); transition: 0.1s; }
-        
-        /* Custom Font untuk Dropdown */
         select { font-family: sans-serif; }
         
-        /* SweetAlert Customization */
+        /* SweetAlert Style */
         .swal2-popup { border-radius: 1rem !important; padding: 1.5rem !important; }
         .swal2-title { font-size: 1.25rem !important; color: #1e293b !important; }
-        .swal2-html-container { margin: 1em 0 !important; }
-        .swal2-confirm { border-radius: 0.5rem !important; font-weight: bold !important; }
-        .swal2-cancel { border-radius: 0.5rem !important; font-weight: bold !important; }
+        .swal2-confirm, .swal2-cancel { border-radius: 0.5rem !important; font-weight: bold !important; }
     </style>
 </head>
 <body class="bg-gray-100 font-sans text-gray-800">
@@ -34,13 +30,13 @@
     <div class="fixed top-0 left-0 right-0 bg-slate-900 text-white z-50 shadow-md">
         <div class="max-w-md mx-auto px-4 h-14 flex justify-between items-center">
             <div class="flex items-center gap-2 font-bold text-lg">
-                <i data-lucide="tent" class="w-5 h-5"></i> Juri<span class="text-yellow-400">App</span>
+                <i data-lucide="tent" class="w-5 h-5 text-yellow-400"></i> Juri<span class="text-yellow-400">App</span>
             </div>
             <div class="flex items-center gap-3 text-xs">
                 <div id="queueBadge" class="hidden bg-orange-500 px-2 py-1 rounded-full font-bold shadow-sm">
                     Antri: <span id="queueCount">0</span>
                 </div>
-                <div id="statusDot" class="w-3 h-3 bg-red-500 rounded-full border-2 border-white shadow"></div>
+                <div id="statusDot" class="w-3 h-3 bg-gray-400 rounded-full border-2 border-white shadow"></div>
             </div>
         </div>
     </div>
@@ -51,7 +47,7 @@
             <div class="bg-white p-6 rounded-2xl shadow-xl border border-gray-100">
                 <div class="text-center mb-6">
                     <div class="bg-slate-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3">
-                        <i data-lucide="user-check" class="w-8 h-8 text-slate-600"></i>
+                        <i data-lucide="shield-check" class="w-8 h-8 text-slate-600"></i>
                     </div>
                     <h2 class="text-xl font-bold text-slate-800">Login Petugas</h2>
                     <p class="text-xs text-gray-400">Atur sesi penilaian Anda</p>
@@ -59,19 +55,15 @@
                 
                 <div class="space-y-5">
                     <div>
-                        <label class="block text-xs font-bold uppercase text-gray-400 mb-2">Kategori Peserta</label>
+                        <label class="block text-xs font-bold uppercase text-gray-400 mb-2">Kategori (Wajib)</label>
                         <div class="grid grid-cols-2 gap-3">
-                            <button onclick="selectCategory('Putra')" id="btnLoginPa" class="p-4 rounded-xl border-2 border-slate-100 flex flex-col items-center justify-center gap-2 hover:bg-blue-50 transition-all group opacity-50">
-                                <div class="bg-blue-100 p-2 rounded-full text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors">
-                                    <i data-lucide="user" class="w-6 h-6"></i>
-                                </div>
-                                <span class="font-bold text-slate-600 group-hover:text-blue-700">PUTRA</span>
+                            <button onclick="selectCategory('Putra')" id="btnLoginPa" class="p-4 rounded-xl border-2 border-slate-100 flex flex-col items-center justify-center gap-2 hover:bg-blue-50 transition-all opacity-60">
+                                <div class="bg-blue-100 p-2 rounded-full text-blue-600"><i data-lucide="user" class="w-6 h-6"></i></div>
+                                <span class="font-bold text-slate-600">PUTRA</span>
                             </button>
-                            <button onclick="selectCategory('Putri')" id="btnLoginPi" class="p-4 rounded-xl border-2 border-slate-100 flex flex-col items-center justify-center gap-2 hover:bg-red-50 transition-all group opacity-50">
-                                <div class="bg-red-100 p-2 rounded-full text-red-600 group-hover:bg-red-600 group-hover:text-white transition-colors">
-                                    <i data-lucide="user-check" class="w-6 h-6"></i>
-                                </div>
-                                <span class="font-bold text-slate-600 group-hover:text-red-700">PUTRI</span>
+                            <button onclick="selectCategory('Putri')" id="btnLoginPi" class="p-4 rounded-xl border-2 border-slate-100 flex flex-col items-center justify-center gap-2 hover:bg-red-50 transition-all opacity-60">
+                                <div class="bg-red-100 p-2 rounded-full text-red-600"><i data-lucide="user-check" class="w-6 h-6"></i></div>
+                                <span class="font-bold text-slate-600">PUTRI</span>
                             </button>
                         </div>
                         <input type="hidden" id="selectedCategory" value="">
@@ -80,8 +72,8 @@
                     <div>
                         <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Pilih Pos / Taman</label>
                         <div class="relative">
-                            <select id="loginTaman" class="w-full p-4 bg-gray-50 border-2 border-gray-200 rounded-xl outline-none focus:border-slate-800 appearance-none font-bold text-slate-700">
-                                <option value="">Sedang memuat data...</option>
+                            <select id="loginTaman" class="w-full p-4 bg-gray-50 border-2 border-gray-200 rounded-xl outline-none focus:border-slate-800 font-bold text-slate-700">
+                                <option value="">Memuat data...</option>
                             </select>
                             <i data-lucide="chevron-down" class="absolute right-4 top-4 w-5 h-5 text-gray-400 pointer-events-none"></i>
                         </div>
@@ -92,7 +84,7 @@
                         <input type="text" id="loginPass" placeholder="******" class="w-full p-4 bg-gray-50 border-2 border-gray-200 rounded-xl outline-none focus:border-slate-800 font-bold text-center tracking-widest text-lg">
                     </div>
 
-                    <button onclick="doLogin()" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-4 rounded-xl btn-active shadow-lg text-lg flex justify-center items-center gap-2 transition-all">
+                    <button onclick="doLogin()" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-4 rounded-xl btn-active shadow-lg text-lg flex justify-center items-center gap-2">
                         <span>MASUK POS</span> <i data-lucide="arrow-right" class="w-5 h-5"></i>
                     </button>
                 </div>
@@ -114,17 +106,17 @@
             </div>
 
             <div class="bg-white p-5 rounded-2xl shadow-xl border border-gray-100 mb-6 relative overflow-hidden">
-                <div class="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-blue-50 rounded-full blur-2xl opacity-50"></div>
+                <div class="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-blue-50 rounded-full blur-2xl opacity-50 pointer-events-none"></div>
 
                 <div class="bg-blue-50 p-3 rounded-lg mb-5 text-xs text-blue-800 flex items-start gap-2 border border-blue-100">
                     <i data-lucide="info" class="w-4 h-4 mt-0.5 flex-shrink-0 text-blue-600"></i>
-                    <p>Cocokkan <b>NOMOR UNDI</b> di dada peserta. Data pangkalan disembunyikan (Blind Judging).</p>
+                    <p>Cocokkan <b>NOMOR UNDI</b> di dada peserta.</p>
                 </div>
 
                 <div class="mb-5">
                     <label class="block text-xs font-bold uppercase text-gray-400 mb-1 ml-1">Nomor & Warna Barung</label>
                     <div class="relative">
-                        <select id="inputBarung" class="w-full p-4 pl-5 text-xl font-black border-2 border-gray-200 rounded-xl bg-white outline-none focus:border-blue-500 appearance-none text-slate-800 tracking-wide transition-all shadow-sm">
+                        <select id="inputBarung" class="w-full p-4 pl-5 text-xl font-black border-2 border-gray-200 rounded-xl bg-white outline-none focus:border-blue-500 text-slate-800 tracking-wide shadow-sm">
                             <option value="">-- Pilih Peserta --</option>
                         </select>
                         <div class="absolute right-4 top-4 bg-gray-100 p-1 rounded-md pointer-events-none">
@@ -136,10 +128,10 @@
 
                 <div class="mb-6">
                     <label class="block text-xs font-bold uppercase text-gray-400 mb-1 ml-1">Nilai (0-100)</label>
-                    <input type="number" id="inputNilai" inputmode="numeric" placeholder="0" class="w-full p-4 text-center text-5xl font-black text-blue-600 border-2 border-gray-200 rounded-xl outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-50 placeholder-gray-200 transition-all shadow-inner bg-gray-50 focus:bg-white">
+                    <input type="number" id="inputNilai" inputmode="numeric" placeholder="0" class="w-full p-4 text-center text-5xl font-black text-blue-600 border-2 border-gray-200 rounded-xl outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-50 placeholder-gray-200 shadow-inner bg-gray-50 focus:bg-white">
                 </div>
 
-                <button onclick="konfirmasiKirim()" class="w-full bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white text-lg font-bold py-4 rounded-xl shadow-lg shadow-green-200 btn-active flex justify-center items-center gap-2 transition-all">
+                <button onclick="konfirmasiKirim()" class="w-full bg-green-600 hover:bg-green-700 text-white text-lg font-bold py-4 rounded-xl shadow-lg shadow-green-200 btn-active flex justify-center items-center gap-2">
                     <i data-lucide="send" class="w-5 h-5"></i> KIRIM NILAI
                 </button>
             </div>
@@ -149,8 +141,7 @@
                     <h3 class="text-xs font-bold text-gray-400 uppercase">Sudah Dinilai (Sesi Ini)</h3>
                     <span class="text-[10px] bg-gray-200 px-2 py-0.5 rounded text-gray-500" id="histCount">0</span>
                 </div>
-                <div id="historyList" class="space-y-2 pb-20">
-                    </div>
+                <div id="historyList" class="space-y-2 pb-20"></div>
             </div>
         </div>
 
@@ -159,14 +150,15 @@
     <script>
         lucide.createIcons();
 
-        // State Global
+        // STATE
         let dbTaman = []; 
         let dbBarung = []; 
         let session = JSON.parse(localStorage.getItem('scout_session'));
         let queue = JSON.parse(localStorage.getItem('scout_queue')) || [];
         let assessedIds = JSON.parse(localStorage.getItem('scout_assessed')) || [];
+        let sessionHistory = JSON.parse(localStorage.getItem('scout_history')) || [];
 
-        // --- 1. INITIALIZE ---
+        // INIT
         window.onload = function() {
             updateQueueUI();
             if (session) {
@@ -178,7 +170,7 @@
             setInterval(processQueue, 2000);
         };
 
-        // --- 2. DATA HANDLING ---
+        // DATA
         async function fetchMasterData() {
             try {
                 let res = await fetch(API_URL + "?action=getData");
@@ -192,7 +184,7 @@
                     document.getElementById('statusDot').className = "w-3 h-3 bg-green-500 rounded-full border-2 border-white shadow";
                 }
             } catch (e) {
-                console.log("Offline mode");
+                console.log("Offline");
                 dbTaman = JSON.parse(localStorage.getItem('db_taman')) || [];
                 dbBarung = JSON.parse(localStorage.getItem('db_barung')) || [];
                 renderLoginDropdown();
@@ -208,15 +200,14 @@
             });
         }
 
-        // --- 3. LOGIN LOGIC ---
+        // LOGIN
         function selectCategory(cat) {
             document.getElementById('selectedCategory').value = cat;
             const btnPa = document.getElementById('btnLoginPa');
             const btnPi = document.getElementById('btnLoginPi');
             
-            // Reset Style
-            btnPa.className = "p-4 rounded-xl border-2 border-slate-100 flex flex-col items-center justify-center gap-2 hover:bg-blue-50 transition-all group opacity-50";
-            btnPi.className = "p-4 rounded-xl border-2 border-slate-100 flex flex-col items-center justify-center gap-2 hover:bg-red-50 transition-all group opacity-50";
+            btnPa.className = "p-4 rounded-xl border-2 border-slate-100 flex flex-col items-center justify-center gap-2 hover:bg-blue-50 transition-all opacity-50";
+            btnPi.className = "p-4 rounded-xl border-2 border-slate-100 flex flex-col items-center justify-center gap-2 hover:bg-red-50 transition-all opacity-50";
             
             if(cat === 'Putra') {
                 btnPa.className = "p-4 rounded-xl border-2 border-blue-500 bg-blue-50 flex flex-col items-center justify-center gap-2 text-blue-700 shadow-md transform scale-105 opacity-100 ring-2 ring-blue-200";
@@ -231,8 +222,8 @@
             let pass = document.getElementById('loginPass').value;
             
             if(!cat) return Swal.fire({icon:'warning', title:'Pilih Kategori', text:'Klik tombol Putra atau Putri', confirmButtonColor:'#334155'});
-            if(!id) return Swal.fire({icon:'warning', title:'Pilih Pos', text:'Pos/Taman belum dipilih', confirmButtonColor:'#334155'});
-            if(!pass) return Swal.fire({icon:'warning', title:'Password Kosong', text:'Masukkan kode akses pos', confirmButtonColor:'#334155'});
+            if(!id) return Swal.fire({icon:'warning', title:'Pilih Pos', text:'Pos belum dipilih', confirmButtonColor:'#334155'});
+            if(!pass) return Swal.fire({icon:'warning', title:'Password Kosong', text:'Masukkan kode akses', confirmButtonColor:'#334155'});
 
             if(dbTaman.length === 0) dbTaman = JSON.parse(localStorage.getItem('db_taman')) || [];
             let found = dbTaman.find(t => t[0] == id);
@@ -241,20 +232,16 @@
             if (found[2] == pass) {
                 session = { id: found[0], nama: found[1], kategori: cat };
                 localStorage.setItem('scout_session', JSON.stringify(session));
-                
                 Swal.fire({
-                    icon: 'success',
-                    title: 'Berhasil Masuk',
-                    text: `Selamat bertugas di ${found[1]}`,
-                    timer: 1500,
-                    showConfirmButton: false
+                    icon: 'success', title: 'Berhasil Masuk', text: 'Selamat Bertugas!',
+                    timer: 1000, showConfirmButton: false
                 }).then(() => tampilkanHalamanInput());
             } else {
-                Swal.fire({icon:'error', title:'Akses Ditolak', text:'Password Salah!', confirmButtonColor:'#d33'});
+                Swal.fire({icon:'error', title:'Gagal', text:'Password Salah!', confirmButtonColor:'#d33'});
             }
         }
 
-        // --- 4. INSIDE APP ---
+        // DASHBOARD
         function tampilkanHalamanInput() {
             document.getElementById('pageLogin').classList.add('hidden');
             document.getElementById('pageInput').classList.remove('hidden');
@@ -282,76 +269,49 @@
                 return g.includes(session.kategori.toLowerCase());
             });
 
-            // Filter yang sudah dinilai
             let remaining = filtered.filter(b => !assessedIds.includes(b[0]));
-
             remaining.sort((a,b) => String(a[0]).localeCompare(String(b[0]), undefined, {numeric: true, sensitivity: 'base'}));
 
             remaining.forEach(b => {
                 let opt = document.createElement('option');
                 opt.value = JSON.stringify({id: b[0], nama: b[1], sekolah: b[2]});
-                opt.text = `${b[0]} - ${b[1]}`; 
+                opt.text = b[0] + ' - ' + b[1]; 
                 sel.appendChild(opt);
             });
 
-            document.getElementById('barungCount').innerText = `${remaining.length} Regu Tersedia`;
-            
-            if(remaining.length === 0) {
-                 document.getElementById('barungCount').innerText = "Semua Selesai! 🎉";
-            }
+            document.getElementById('barungCount').innerText = remaining.length + " Regu Tersedia";
+            if(remaining.length === 0) document.getElementById('barungCount').innerText = "Semua Selesai! 🎉";
         }
 
-        // --- 5. SUBMIT WITH SWEETALERT ---
+        // KIRIM
         function konfirmasiKirim() {
             let barungVal = document.getElementById('inputBarung').value;
             let nilai = document.getElementById('inputNilai').value;
 
             if (!barungVal || nilai === "") { 
-                return Swal.fire({
-                    icon: 'warning',
-                    title: 'Belum Lengkap',
-                    text: 'Mohon pilih Peserta dan isi Nilai.',
-                    confirmButtonColor: '#334155'
-                }); 
+                return Swal.fire({icon:'warning', title:'Belum Lengkap', text:'Pilih Peserta & Isi Nilai', confirmButtonColor:'#334155'}); 
             }
             
             let barungData = JSON.parse(barungVal);
             
-            // KONFIRMASI KEREN
+            let htmlContent = '<div class="text-left bg-gray-50 p-3 rounded border">';
+            htmlContent += '<p class="text-xs text-gray-500">NOMOR</p><p class="font-bold text-lg mb-2">' + barungData.id + '</p>';
+            htmlContent += '<p class="text-xs text-gray-500">BARUNG</p><p class="font-bold text-lg mb-2">' + barungData.nama + '</p>';
+            htmlContent += '<div class="text-center mt-4 border-t pt-2"><p class="text-xs text-gray-400">NILAI</p><p class="text-5xl font-black text-blue-600">' + nilai + '</p></div>';
+            htmlContent += '</div>';
+
             Swal.fire({
-                title: 'Konfirmasi Nilai',
-                html: `
-                    <div class="bg-gray-50 p-4 rounded-lg text-left border border-gray-200">
-                        <div class="flex justify-between border-b pb-2 mb-2">
-                            <span class="text-gray-500 text-xs uppercase font-bold">Nomor</span>
-                            <span class="font-bold text-lg">${barungData.id}</span>
-                        </div>
-                        <div class="flex justify-between border-b pb-2 mb-2">
-                            <span class="text-gray-500 text-xs uppercase font-bold">Barung</span>
-                            <span class="font-bold text-lg text-slate-700">${barungData.nama}</span>
-                        </div>
-                        <div class="text-center mt-4">
-                            <span class="text-gray-400 text-[10px] uppercase tracking-widest">NILAI YANG DIBERIKAN</span>
-                            <div class="text-6xl font-black text-blue-600 my-1">${nilai}</div>
-                        </div>
-                    </div>
-                    <p class="text-xs text-red-500 mt-3 font-bold">Pastikan data benar. Tidak bisa diubah.</p>
-                `,
-                showCancelButton: true,
-                confirmButtonColor: '#16a34a',
-                cancelButtonColor: '#ef4444',
-                confirmButtonText: 'YA, KIRIM',
-                cancelButtonText: 'Batal',
-                reverseButtons: true,
-                focusConfirm: false
+                title: 'Konfirmasi', html: htmlContent,
+                showCancelButton: true, confirmButtonColor: '#16a34a', cancelButtonColor: '#ef4444',
+                confirmButtonText: 'YA, KIRIM', cancelButtonText: 'Batal'
             }).then((result) => {
-                if (result.isConfirmed) {
-                    simpanKeAntrian(barungData, nilai);
-                }
+                if (result.isConfirmed) { simpanKeAntrian(barungData, nilai); }
             });
         }
 
         function simpanKeAntrian(barungData, nilai) {
+            let timestamp = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+            
             let paket = {
                 uid: Date.now(),
                 idTaman: session.id,
@@ -360,11 +320,15 @@
                 namaBarung: barungData.nama,
                 pangkalan: barungData.sekolah,
                 nilai: nilai,
-                timestamp: new Date().toLocaleTimeString()
+                timestamp: timestamp,
+                status: 'pending'
             };
 
             queue.push(paket);
             localStorage.setItem('scout_queue', JSON.stringify(queue));
+
+            sessionHistory.unshift(paket);
+            localStorage.setItem('scout_history', JSON.stringify(sessionHistory));
 
             assessedIds.push(barungData.id);
             localStorage.setItem('scout_assessed', JSON.stringify(assessedIds));
@@ -374,37 +338,46 @@
             document.getElementById('inputBarung').focus(); 
 
             loadBarungBySession();
-            addHistoryUI(paket, "pending");
+            renderHistoryFromStorage();
             updateQueueUI();
             processQueue();
 
-            // Notifikasi Sukses Kecil
-            const Toast = Swal.mixin({
-                toast: true, position: 'top-end', showConfirmButton: false, timer: 3000, timerProgressBar: true
-            });
-            Toast.fire({ icon: 'success', title: 'Data tersimpan' });
+            const Toast = Swal.mixin({toast: true, position: 'top-end', showConfirmButton: false, timer: 3000, timerProgressBar: true});
+            Toast.fire({ icon: 'success', title: 'Tersimpan' });
         }
 
         async function processQueue() {
             if (queue.length === 0) return;
+            
             let statusDot = document.getElementById('statusDot');
             statusDot.className = "w-3 h-3 bg-yellow-400 rounded-full animate-ping";
+            
             let item = queue[0];
+
             try {
                 await fetch(API_URL, {
                     method: 'POST', mode: 'no-cors', headers: { "Content-Type": "text/plain" }, body: JSON.stringify(item)
                 });
+                
                 queue.shift();
                 localStorage.setItem('scout_queue', JSON.stringify(queue));
+                
+                let histIndex = sessionHistory.findIndex(x => x.uid === item.uid);
+                if(histIndex !== -1) {
+                    sessionHistory[histIndex].status = 'sent';
+                    localStorage.setItem('scout_history', JSON.stringify(sessionHistory));
+                    renderHistoryFromStorage();
+                }
+
                 updateQueueUI();
-                updateHistoryStatus(item.uid);
                 statusDot.className = "w-3 h-3 bg-green-500 rounded-full shadow";
+
             } catch (err) {
                 statusDot.className = "w-3 h-3 bg-red-500 rounded-full shadow";
             }
         }
 
-        // --- UI HELPER ---
+        // UI HELPERS
         function updateQueueUI() {
             let count = queue.length;
             let badge = document.getElementById('queueBadge');
@@ -412,67 +385,42 @@
             count > 0 ? badge.classList.remove('hidden') : badge.classList.add('hidden');
         }
 
-        function addHistoryUI(paket, status) {
-            let list = document.getElementById('historyList');
-            let div = document.createElement('div');
-            div.id = "hist-" + paket.uid;
-            div.className = "bg-white p-4 rounded-xl border border-gray-100 flex justify-between items-center text-sm shadow-sm animate-[fadeIn_0.3s] mb-2";
-            
-            div.innerHTML = `
-                <div class="flex items-center gap-3">
-                    <div class="bg-gray-100 w-10 h-10 rounded-lg flex items-center justify-center font-bold text-gray-600 text-xs border border-gray-200">
-                        ${paket.idBarung}
-                    </div>
-                    <div>
-                        <div class="font-bold text-gray-700 text-sm">${paket.namaBarung}</div>
-                        <div class="text-[10px] text-gray-400 flex items-center gap-1">
-                            <i data-lucide="clock" class="w-3 h-3"></i> ${paket.timestamp}
-                        </div>
-                    </div>
-                </div>
-                <div class="text-right">
-                    <div class="font-black text-blue-600 text-xl">${paket.nilai}</div>
-                    <div id="icon-${paket.uid}" class="text-[10px] font-bold text-gray-400">
-                        ${status == 'pending' ? '<span class="text-orange-400">Mengantri...</span>' : '<span class="text-green-500 flex items-center justify-end gap-1">Terkirim <i data-lucide="check-circle" class="w-3 h-3"></i></span>'}
-                    </div>
-                </div>
-            `;
-            list.insertBefore(div, list.firstChild);
-            lucide.createIcons();
-            
-            // Update Counter
-            let currentCount = parseInt(document.getElementById('histCount').innerText);
-            document.getElementById('histCount').innerText = currentCount + 1;
-        }
-
         function renderHistoryFromStorage() {
              let list = document.getElementById('historyList');
              list.innerHTML = "";
-             document.getElementById('histCount').innerText = "0";
-             // Render logic sederhana: hanya queue yang tampil (karena assessedIds hanya ID)
-             // Jika ingin full history harus simpan objek full di localStorage
-             queue.forEach(q => addHistoryUI(q, 'pending'));
-        }
-
-        function updateHistoryStatus(uid) {
-            let el = document.getElementById("icon-" + uid);
-            if(el) el.innerHTML = '<span class="text-green-500 flex items-center justify-end gap-1">Terkirim <i data-lucide="check-circle" class="w-3 h-3"></i></span>';
-            lucide.createIcons();
+             
+             sessionHistory.forEach(item => {
+                let statusBadge = item.status === 'pending' 
+                    ? '<span class="text-orange-400 flex items-center gap-1">Antri...</span>' 
+                    : '<span class="text-green-600 flex items-center gap-1 font-bold">Terkirim <i data-lucide="check-circle" class="w-4 h-4"></i></span>';
+                
+                let div = document.createElement('div');
+                div.className = "bg-white p-4 rounded-xl border border-gray-100 flex justify-between items-center text-sm shadow-sm mb-2";
+                
+                let html = '<div class="flex items-center gap-3">';
+                html += '<div class="bg-gray-100 w-10 h-10 rounded-lg flex items-center justify-center font-bold text-gray-600 text-xs border border-gray-200">' + item.idBarung + '</div>';
+                html += '<div><div class="font-bold text-gray-700 text-sm">' + item.namaBarung + '</div>';
+                html += '<div class="text-[10px] text-gray-400 flex items-center gap-1"><i data-lucide="clock" class="w-3 h-3"></i> ' + item.timestamp + '</div></div></div>';
+                html += '<div class="text-right"><div class="font-black text-blue-600 text-xl">' + item.nilai + '</div>';
+                html += '<div class="text-[10px] text-gray-400 flex justify-end mt-1">' + statusBadge + '</div></div>';
+                
+                div.innerHTML = html;
+                list.appendChild(div);
+             });
+             
+             document.getElementById('histCount').innerText = sessionHistory.length;
+             lucide.createIcons();
         }
 
         function doLogout() {
             Swal.fire({
-                title: 'Ganti Pos / Keluar?',
-                text: "Anda harus login lagi untuk menilai.",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#ef4444',
-                cancelButtonColor: '#334155',
-                confirmButtonText: 'Ya, Keluar'
+                title: 'Keluar?', text: "Riwayat sesi ini akan dihapus.", icon: 'warning',
+                showCancelButton: true, confirmButtonColor: '#ef4444', cancelButtonColor: '#334155', confirmButtonText: 'Ya, Logout'
             }).then((result) => {
                 if (result.isConfirmed) {
                     localStorage.removeItem('scout_session');
-                    localStorage.removeItem('scout_assessed'); 
+                    localStorage.removeItem('scout_assessed');
+                    localStorage.removeItem('scout_history'); 
                     location.reload();
                 }
             });
