@@ -17,12 +17,18 @@
             .no-print, nav, #loginOverlay, .tab-menu { display: none !important; }
             #printArea { display: block !important; position: absolute; top: 0; left: 0; width: 100%; background: white; color: black; }
             body { background: white; padding: 0; margin: 0; }
+            
+            /* Reset Table Style for Print */
             table { width: 100%; border-collapse: collapse; border: 1px solid black; }
-            th, td { border: 1px solid black; padding: 8px; text-align: left; font-size: 12px; }
-            th { background-color: #f0f0f0 !important; -webkit-print-color-adjust: exact; text-align: center; }
+            th, td { border: 1px solid black; padding: 4px; text-align: left; font-size: 11px; } /* Font diperkecil biar muat */
+            th { background-color: #f0f0f0 !important; -webkit-print-color-adjust: exact; text-align: center; font-weight: bold; }
+            
             .text-right { text-align: right; }
             .text-center { text-align: center; }
-            .kop-surat { text-align: center; margin-bottom: 20px; border-bottom: 3px double black; padding-bottom: 10px; }
+            .kop-surat { text-align: center; margin-bottom: 10px; border-bottom: 3px double black; padding-bottom: 5px; }
+            
+            /* Force Landscape untuk Tabel Lebar */
+            @page { size: landscape; margin: 10mm; }
         }
         
         #printArea { display: none; }
@@ -153,12 +159,31 @@
         </div>
 
         <div id="tab-laporan" class="space-y-6 hidden animate-fade-in">
+            
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-purple-200 bg-purple-50">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="bg-purple-200 p-2 rounded-lg"><i data-lucide="table" class="w-6 h-6 text-purple-700"></i></div>
+                    <div>
+                        <h3 class="font-bold text-lg text-purple-900">Matriks Rekapitulasi (Lengkap)</h3>
+                        <p class="text-xs text-purple-600">Tabel seluruh nilai peserta di semua mata lomba (Landscape).</p>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <button onclick="printRekapMatriks('Putra')" class="bg-purple-700 text-white py-3 rounded-lg font-bold hover:bg-purple-800 flex justify-center items-center gap-2 shadow-lg shadow-purple-200 transition transform active:scale-95">
+                        <i data-lucide="printer" class="w-4 h-4"></i> REKAP PUTRA
+                    </button>
+                    <button onclick="printRekapMatriks('Putri')" class="bg-purple-700 text-white py-3 rounded-lg font-bold hover:bg-purple-800 flex justify-center items-center gap-2 shadow-lg shadow-purple-200 transition transform active:scale-95">
+                        <i data-lucide="printer" class="w-4 h-4"></i> REKAP PUTRI
+                    </button>
+                </div>
+            </div>
+
             <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
                 <div class="flex items-center gap-3 mb-4">
                     <div class="bg-yellow-100 p-2 rounded-lg"><i data-lucide="trophy" class="w-6 h-6 text-yellow-600"></i></div>
                     <div>
-                        <h3 class="font-bold text-lg">Cetak Juara (Klasemen)</h3>
-                        <p class="text-xs text-slate-500">Pilih kategori regu yang ingin dicetak.</p>
+                        <h3 class="font-bold text-lg">Cetak Juara (Klasemen Simple)</h3>
+                        <p class="text-xs text-slate-500">Hanya menampilkan Ranking, Nama, dan Total Nilai.</p>
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-3">
@@ -171,25 +196,27 @@
                 </div>
             </div>
 
-            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
-                <div class="flex items-center gap-3 mb-4">
-                    <div class="bg-blue-100 p-2 rounded-lg"><i data-lucide="tent" class="w-6 h-6 text-blue-600"></i></div>
-                    <div><h3 class="font-bold text-lg">Rekap Per Taman</h3></div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+                    <div class="flex items-center gap-2 mb-2">
+                        <i data-lucide="tent" class="w-5 h-5 text-blue-600"></i>
+                        <h3 class="font-bold text-sm uppercase">Rekap Per Taman</h3>
+                    </div>
+                    <div class="flex gap-2">
+                        <select id="selectTamanPrint" class="flex-1 p-2 border rounded bg-slate-50 text-xs font-bold"><option value="">Pilih Taman...</option></select>
+                        <button onclick="printRekapTaman()" class="bg-blue-600 text-white px-3 rounded hover:bg-blue-700"><i data-lucide="printer" class="w-4 h-4"></i></button>
+                    </div>
                 </div>
-                <div class="flex gap-2">
-                    <select id="selectTamanPrint" class="flex-1 p-3 border rounded-lg bg-slate-50 text-sm font-bold"><option value="">Pilih Taman...</option></select>
-                    <button onclick="printRekapTaman()" class="bg-blue-600 text-white px-4 rounded-lg hover:bg-blue-700"><i data-lucide="printer"></i></button>
-                </div>
-            </div>
 
-            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
-                <div class="flex items-center gap-3 mb-4">
-                    <div class="bg-green-100 p-2 rounded-lg"><i data-lucide="users" class="w-6 h-6 text-green-600"></i></div>
-                    <div><h3 class="font-bold text-lg">Rapor Barung</h3></div>
-                </div>
-                <div class="flex gap-2">
-                    <select id="selectBarungPrint" class="flex-1 p-3 border rounded-lg bg-slate-50 text-sm font-bold"><option value="">Pilih Barung...</option></select>
-                    <button onclick="printRaporBarung()" class="bg-green-600 text-white px-4 rounded-lg hover:bg-green-700"><i data-lucide="printer"></i></button>
+                <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+                    <div class="flex items-center gap-2 mb-2">
+                        <i data-lucide="users" class="w-5 h-5 text-green-600"></i>
+                        <h3 class="font-bold text-sm uppercase">Rapor Barung</h3>
+                    </div>
+                    <div class="flex gap-2">
+                        <select id="selectBarungPrint" class="flex-1 p-2 border rounded bg-slate-50 text-xs font-bold"><option value="">Pilih Barung...</option></select>
+                        <button onclick="printRaporBarung()" class="bg-green-600 text-white px-3 rounded hover:bg-green-700"><i data-lucide="printer" class="w-4 h-4"></i></button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -199,17 +226,17 @@
         <div class="kop-surat">
             <h1 style="font-size: 20px; font-weight: bold; margin: 0;">GERAKAN PRAMUKA</h1>
             <h1 style="font-size: 20px; font-weight: bold; margin: 0;">KWARTIR RANTING SELOGIRI</h1>
-            <h2 style="font-size: 14px; margin: 10px 0; font-weight: normal;">LAPORAN HASIL PESTA SIAGA TAHUN 2026</h2>
+            <h2 style="font-size: 14px; margin: 5px 0; font-weight: normal;">LAPORAN HASIL PESTA SIAGA TAHUN 2026</h2>
         </div>
         <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
-            <div>Hal: <span id="printCategory" style="font-weight: bold;">-</span></div>
-            <div>Waktu Cetak: <span id="printDate"></span></div>
+            <div style="font-size: 12px;">Hal: <span id="printCategory" style="font-weight: bold;">-</span></div>
+            <div style="font-size: 12px;">Waktu Cetak: <span id="printDate"></span></div>
         </div>
         <h3 id="printTitle" style="text-align: center; margin-bottom: 15px; text-transform: uppercase; font-weight: bold; font-size: 16px; text-decoration: underline;">JUDUL LAPORAN</h3>
         <div id="printContent"></div>
-        <div style="margin-top: 40px; display: flex; justify-content: space-between; page-break-inside: avoid;">
-            <div style="text-align: center; width: 30%;"><br>Mengetahui,<br>Ketua Panitia<br><br><br><br><br>____________________</div>
-            <div style="text-align: center; width: 30%;">Selogiri, <span id="printDateSign"></span><br>Petugas Admin<br><br><br><br><br>____________________</div>
+        <div style="margin-top: 30px; display: flex; justify-content: space-between; page-break-inside: avoid;">
+            <div style="text-align: center; width: 30%; font-size: 12px;"><br>Mengetahui,<br>Ketua Panitia<br><br><br><br><br>____________________</div>
+            <div style="text-align: center; width: 30%; font-size: 12px;">Selogiri, <span id="printDateSign"></span><br>Petugas Admin<br><br><br><br><br>____________________</div>
         </div>
     </div>
 
@@ -229,25 +256,22 @@
             PASSWORD = pass;
             document.getElementById('loginOverlay').classList.add('hidden');
             loadAllData();
-            setInterval(loadAllData, 30000); // Auto refresh
+            setInterval(loadAllData, 30000);
         }
         function logout() { location.reload(); }
 
-        // --- HELPER SAKTI: AMAN DARI ERROR ---
+        // --- HELPER SAKTI ---
         function getSafeGender(namaBarung) {
             let info = masterBarung.find(b => b[1] == namaBarung);
-            // Jika ada info DAN ada kolom gender (col index 3)
-            if (info && info[3]) {
-                return String(info[3]); // Pastikan return String
-            }
-            return "?"; // Default jika data kosong
+            if (info && info[3]) return String(info[3]);
+            return "?"; 
         }
 
         // --- LOAD DATA ---
         async function loadAllData() {
             document.getElementById('lastUpdate').innerText = "Memuat...";
             try {
-                // 1. Load Master Data Dulu (PENTING!)
+                // 1. Master Data
                 const resMaster = await fetch(API_URL + "?action=getData");
                 const jsonMaster = await resMaster.json();
                 if(jsonMaster.status === "success") {
@@ -256,7 +280,7 @@
                      renderDropdownPrint();
                 }
 
-                // 2. Load Transaksi
+                // 2. Transaksi
                 const resAdmin = await fetch(API_URL + "?action=getAdminData");
                 const jsonAdmin = await resAdmin.json();
                 if(jsonAdmin.status === "success") {
@@ -264,7 +288,7 @@
                     renderStatsAndLog(rawData);
                 }
 
-                // 3. Load Klasemen
+                // 3. Klasemen Live
                 const resKlasemen = await fetch(API_URL + "?action=getKlasemen");
                 const jsonKlasemen = await resKlasemen.json();
                 if(jsonKlasemen.status === "success") {
@@ -288,7 +312,7 @@
             let viewData = data.slice().reverse().slice(0, 30); 
 
             viewData.forEach(row => {
-                let genderStr = getSafeGender(row[2]); // Pakai helper aman
+                let genderStr = getSafeGender(row[2]);
                 let isPutra = genderStr.toLowerCase().includes("putra");
                 let badgeClass = isPutra ? "bg-slate-200 text-slate-700" : (genderStr === "?" ? "bg-gray-100 text-gray-500" : "bg-red-100 text-red-700");
                 let badgeLabel = isPutra ? "PA" : (genderStr === "?" ? "?" : "PI");
@@ -360,24 +384,91 @@
             document.getElementById('printContent').innerHTML = "";
         }
 
+        // A. MATRIKS REKAPITULASI (BARU & LENGKAP)
+        async function printRekapMatriks(gender) {
+            if(!confirm(`Cetak Matriks Rekapitulasi ${gender}?`)) return;
+            
+            // 1. Siapkan Data
+            let listTaman = masterTaman.map(t => t[1]).sort(); 
+            let listBarung = masterBarung.filter(b => {
+                let g = b[3] ? String(b[3]) : "?";
+                return g.toLowerCase().includes(gender.toLowerCase());
+            });
+
+            if(listBarung.length === 0) return alert("Data Barung kosong.");
+
+            // 2. Mapping Nilai
+            let dataRekap = {};
+            listBarung.forEach(b => {
+                dataRekap[b[1]] = { pangkalan: b[2], nilai: {}, total: 0 };
+                listTaman.forEach(t => dataRekap[b[1]].nilai[t] = 0);
+            });
+
+            rawData.forEach(row => {
+                let nmBarung = row[2]; let nmTaman = row[1]; let skor = parseInt(row[4]);
+                if(dataRekap[nmBarung]) {
+                    // Cek jika data sudah ada sebelumnya (timpa dengan yang baru jika ada revisi?)
+                    // Asumsi: Kita ambil total nilai yang tercatat (Jika ada duplikat seharusnya dihapus admin)
+                    // Disini kita pakai logika: Timpa nilai terakhir.
+                    let oldVal = dataRekap[nmBarung].nilai[nmTaman] || 0;
+                    dataRekap[nmBarung].total = (dataRekap[nmBarung].total - oldVal) + skor;
+                    dataRekap[nmBarung].nilai[nmTaman] = skor;
+                }
+            });
+
+            let arrayRekap = listBarung.map(b => {
+                return { nama: b[1], pangkalan: b[2], detail: dataRekap[b[1]].nilai, total: dataRekap[b[1]].total };
+            });
+
+            // 3. Sort Ranking
+            arrayRekap.sort((a,b) => b.total - a.total);
+
+            // 4. Render HTML
+            preparePrint("REKAPITULASI NILAI AKHIR", "KATEGORI: " + gender.toUpperCase());
+            
+            let html = `<table style="font-size: 11px; width: 100%;">
+                <thead>
+                    <tr>
+                        <th rowspan="2" style="width:30px">RANGKING</th>
+                        <th rowspan="2" style="width:40px">NO</th>
+                        <th rowspan="2">NAMA BARUNG</th>
+                        <th rowspan="2">PANGKALAN</th>
+                        <th colspan="${listTaman.length}">MATA LOMBA (TAMAN)</th>
+                        <th rowspan="2" style="width:50px">TOTAL</th>
+                    </tr>
+                    <tr>${listTaman.map(t => `<th>${t}</th>`).join('')}</tr>
+                </thead>
+                <tbody>`;
+
+            arrayRekap.forEach((row, index) => {
+                html += `<tr>
+                    <td style="text-align:center; font-weight:bold">${index + 1}</td>
+                    <td style="text-align:center">${index + 1}</td>
+                    <td>${row.nama}</td>
+                    <td>${row.pangkalan}</td>
+                    ${listTaman.map(t => `<td style="text-align:center">${row.detail[t] || '-'}</td>`).join('')}
+                    <td style="text-align:center; font-weight:bold; background-color:#eee">${row.total}</td>
+                </tr>`;
+            });
+            html += `</tbody></table>`;
+            
+            document.getElementById('printContent').innerHTML = html;
+            window.print();
+        }
+
+        // B. printKlasemen, C. printRekapTaman, D. printRaporBarung (Sama seperti sebelumnya)
         async function printKlasemen(gender) {
             if(!confirm(`Cetak Klasemen ${gender}?`)) return;
             try {
                 const res = await fetch(API_URL + "?action=getKlasemen");
                 const json = await res.json();
-                
                 let filtered = json.data.filter(row => {
-                    let g = getSafeGender(row[0]);
-                    return g.toLowerCase().includes(gender.toLowerCase());
+                    let g = getSafeGender(row[0]); return g.toLowerCase().includes(gender.toLowerCase());
                 });
-
                 if(filtered.length === 0) return alert("Belum ada data.");
-
                 preparePrint("KLASEMEN AKHIR", "KATEGORI " + gender.toUpperCase());
                 let html = `<table><thead><tr><th style="width:50px">RANGKING</th><th>BARUNG</th><th>PANGKALAN</th><th style="text-align:right">TOTAL NILAI</th></tr></thead><tbody>`;
-                filtered.forEach((row, index) => {
-                    html += `<tr><td class="text-center font-bold">${index + 1}</td><td>${row[0]}</td><td>${row[1]}</td><td class="text-right font-bold">${row[2]}</td></tr>`;
-                });
+                filtered.forEach((row, index) => { html += `<tr><td class="text-center font-bold">${index + 1}</td><td>${row[0]}</td><td>${row[1]}</td><td class="text-right font-bold">${row[2]}</td></tr>`; });
                 html += `</tbody></table>`;
                 document.getElementById('printContent').innerHTML = html;
                 window.print();
