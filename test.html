@@ -4,142 +4,155 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Juri - ScoutLive</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⛺</text></svg>">
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
     <style>
         body { -webkit-tap-highlight-color: transparent; }
-        .btn-click:active { transform: scale(0.97); }
-        .swal2-popup { border-radius: 1rem !important; }
+        .btn-click:active { transform: scale(0.95); transition: 0.1s; }
         
-        /* Custom Scrollbar untuk Modal */
-        ::-webkit-scrollbar { width: 6px; }
+        /* Custom Scrollbar Tipis */
+        ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+
+        /* SweetAlert Compact Style */
+        .swal2-popup { border-radius: 1rem !important; padding: 1.2rem 1rem !important; width: 90% !important; max-width: 320px !important; }
+        .swal2-title { font-size: 1.1rem !important; color: #1e293b !important; margin-bottom: 0.2rem !important; }
+        .swal2-actions { margin-top: 0.5rem !important; }
+        .swal2-confirm, .swal2-cancel { border-radius: 0.5rem !important; font-weight: bold !important; font-size: 0.85rem !important; padding: 0.6rem 1.2rem !important; }
     </style>
 </head>
 <body class="bg-slate-100 font-sans text-slate-800 pb-20">
 
     <script>
-        // PASTE URL API ANDA DI BAWAH INI (Harus hasil Deploy V6 terbaru)
+        // PASTE URL API ANDA DI SINI
         const API_URL = "https://script.google.com/macros/s/AKfycbyfB19FroqDqmvn7JfSjxNQ03NzPB6_dgajXxGms_bwD51-Crhet615fcWG3xJVC4Uv/exec"; 
     </script>
 
-    <div class="fixed top-0 left-0 right-0 bg-slate-900 text-white z-40 shadow-lg">
-        <div class="max-w-md mx-auto px-4 h-14 flex justify-between items-center">
-            <div class="flex items-center gap-2 font-bold text-lg">
-                <i data-lucide="tent" class="w-5 h-5 text-yellow-400"></i> Juri<span class="text-yellow-400">App</span>
+    <div class="fixed top-0 left-0 right-0 bg-slate-900 text-white z-40 shadow-md">
+        <div class="max-w-md mx-auto px-4 h-12 flex justify-between items-center">
+            <div class="flex items-center gap-2 font-bold text-base">
+                <i data-lucide="tent" class="w-4 h-4 text-yellow-400"></i> Juri<span class="text-yellow-400">App</span>
             </div>
             <div class="flex items-center gap-2">
-                <div id="syncIndicator" class="text-[10px] text-slate-400 flex items-center gap-1 hidden">
+                <div id="syncIndicator" class="text-[9px] text-slate-400 flex items-center gap-1 hidden">
                     <i data-lucide="refresh-cw" class="w-3 h-3 animate-spin"></i> Sync...
                 </div>
-                <div id="statusDot" class="w-3 h-3 bg-gray-400 rounded-full border-2 border-white shadow"></div>
+                <div id="statusDot" class="w-2.5 h-2.5 bg-gray-400 rounded-full border border-slate-700"></div>
             </div>
         </div>
     </div>
 
-    <div class="max-w-md mx-auto pt-20 px-4">
+    <div class="max-w-md mx-auto pt-16 px-3">
 
         <div id="pageLogin" class="hidden">
-            <div class="bg-white p-6 rounded-2xl shadow-lg border border-slate-200">
-                <div class="text-center mb-6">
-                    <div class="bg-slate-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3">
-                        <i data-lucide="user-check" class="w-8 h-8 text-slate-600"></i>
-                    </div>
-                    <h2 class="text-xl font-bold text-slate-800">Sesi Penilaian</h2>
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+                <div class="text-center mb-5">
+                    <h2 class="text-lg font-bold text-slate-800">Login Pos</h2>
+                    <p class="text-[11px] text-gray-400">Atur sesi penilaian Anda</p>
                 </div>
                 
                 <div class="space-y-4">
-                    <div class="grid grid-cols-2 gap-3">
-                        <button onclick="selectCategory('Putra')" id="btnLoginPa" class="p-4 rounded-xl border-2 border-slate-100 flex flex-col items-center gap-2 opacity-60">
-                            <div class="bg-blue-100 p-2 rounded-full text-blue-600"><i data-lucide="user" class="w-6 h-6"></i></div>
-                            <span class="font-bold text-slate-600">PUTRA</span>
-                        </button>
-                        <button onclick="selectCategory('Putri')" id="btnLoginPi" class="p-4 rounded-xl border-2 border-slate-100 flex flex-col items-center gap-2 opacity-60">
-                            <div class="bg-red-100 p-2 rounded-full text-red-600"><i data-lucide="user-check" class="w-6 h-6"></i></div>
-                            <span class="font-bold text-slate-600">PUTRI</span>
-                        </button>
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase text-gray-400 mb-1.5">Kategori (Wajib)</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button onclick="selectCategory('Putra')" id="btnLoginPa" class="py-2.5 rounded-lg border border-slate-200 flex items-center justify-center gap-2 opacity-60">
+                                <div class="bg-blue-100 p-1.5 rounded-full text-blue-600"><i data-lucide="user" class="w-4 h-4"></i></div>
+                                <span class="font-bold text-sm text-slate-600">PUTRA</span>
+                            </button>
+                            <button onclick="selectCategory('Putri')" id="btnLoginPi" class="py-2.5 rounded-lg border border-slate-200 flex items-center justify-center gap-2 opacity-60">
+                                <div class="bg-red-100 p-1.5 rounded-full text-red-600"><i data-lucide="user-check" class="w-4 h-4"></i></div>
+                                <span class="font-bold text-sm text-slate-600">PUTRI</span>
+                            </button>
+                        </div>
+                        <input type="hidden" id="selectedCategory" value="">
                     </div>
-                    <input type="hidden" id="selectedCategory" value="">
 
-                    <select id="loginTaman" class="w-full p-4 bg-slate-50 border-2 border-slate-200 rounded-xl outline-none focus:border-slate-800 font-bold text-slate-700">
-                        <option value="">Memuat Pos...</option>
-                    </select>
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase text-gray-400 mb-1.5">Pos / Taman</label>
+                        <div class="relative">
+                            <select id="loginTaman" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:border-slate-800 text-sm font-bold text-slate-700 appearance-none">
+                                <option value="">Memuat...</option>
+                            </select>
+                            <i data-lucide="chevron-down" class="absolute right-3 top-3.5 w-4 h-4 text-gray-400 pointer-events-none"></i>
+                        </div>
+                    </div>
 
-                    <input type="text" id="loginPass" placeholder="KODE POS / PASSWORD" class="w-full p-4 bg-slate-50 border-2 border-slate-200 rounded-xl outline-none focus:border-slate-800 font-bold text-center tracking-widest">
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase text-gray-400 mb-1.5">Kode Akses</label>
+                        <input type="text" id="loginPass" placeholder="******" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:border-slate-800 font-bold text-center tracking-widest text-sm">
+                    </div>
 
-                    <button onclick="doLogin()" class="w-full bg-slate-800 text-white font-bold py-4 rounded-xl btn-click flex justify-center items-center gap-2">
-                        MASUK <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                    <button onclick="doLogin()" class="w-full bg-slate-800 text-white font-bold py-3 mt-2 rounded-lg btn-click flex justify-center items-center gap-2 text-sm">
+                        MASUK <i data-lucide="arrow-right" class="w-4 h-4"></i>
                     </button>
                 </div>
             </div>
         </div>
 
-        <div id="pageInput" class="hidden space-y-4">
+        <div id="pageInput" class="hidden space-y-3">
             
-            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex justify-between items-center">
+            <div class="bg-white p-3 rounded-xl shadow-sm border border-slate-200 flex justify-between items-center">
                 <div>
-                    <span id="badgeKategori" class="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-slate-200">-</span>
-                    <h2 id="userTamanName" class="text-lg font-bold text-slate-800 leading-tight mt-1">...</h2>
+                    <div class="flex items-center gap-1.5 mb-0.5">
+                        <span id="badgeKategori" class="px-1.5 py-0.5 rounded text-[9px] font-black uppercase tracking-wider bg-slate-200">-</span>
+                        <p class="text-[9px] text-gray-400 uppercase font-bold tracking-wider">POS ANDA:</p>
+                    </div>
+                    <h2 id="userTamanName" class="text-base font-bold text-slate-800 leading-tight">...</h2>
                 </div>
-                <div class="flex gap-2">
-                    <button onclick="tampilkanRekap()" class="bg-blue-50 text-blue-600 p-2.5 rounded-xl border border-blue-100 hover:bg-blue-100 btn-click" title="Lihat Rekap Saya">
-                        <i data-lucide="file-text" class="w-5 h-5"></i>
+                <div class="flex gap-1.5">
+                    <button onclick="tampilkanRekap()" class="bg-blue-50 text-blue-600 p-2 rounded-lg border border-blue-100 hover:bg-blue-100 btn-click" title="Rekap">
+                        <i data-lucide="file-text" class="w-4 h-4"></i>
                     </button>
-                    <button onclick="doLogout()" class="bg-red-50 text-red-600 p-2.5 rounded-xl border border-red-100 hover:bg-red-100 btn-click" title="Keluar">
-                        <i data-lucide="log-out" class="w-5 h-5"></i>
+                    <button onclick="doLogout()" class="bg-red-50 text-red-600 p-2 rounded-lg border border-red-100 hover:bg-red-100 btn-click" title="Keluar">
+                        <i data-lucide="log-out" class="w-4 h-4"></i>
                     </button>
                 </div>
             </div>
 
-            <div class="bg-white p-5 rounded-2xl shadow-lg border border-slate-200 relative overflow-hidden">
-                <div class="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-blue-50 rounded-full blur-2xl opacity-50 pointer-events-none"></div>
-
-                <div class="mb-4">
-                    <label class="block text-xs font-bold uppercase text-slate-400 mb-2">Cari Barung (No / Warna)</label>
-                    <div class="relative">
-                        <i data-lucide="search" class="absolute left-4 top-4 w-5 h-5 text-slate-400"></i>
-                        <input type="text" id="searchBox" onkeyup="filterDaftarBarung()" placeholder="Ketik nomor atau warna..." class="w-full p-4 pl-12 bg-slate-50 border-2 border-slate-200 rounded-xl outline-none focus:border-blue-500 font-bold text-slate-700 transition-colors">
-                    </div>
+            <div class="bg-white p-3.5 rounded-xl shadow-sm border border-slate-200">
+                
+                <div class="flex justify-between items-center mb-3 px-1 border-b border-slate-100 pb-2">
+                    <span id="counterSisa" class="text-[10px] font-bold text-slate-500"><i data-lucide="list" class="w-3 h-3 inline"></i> 0 Antri</span>
+                    <span id="counterSelesai" class="text-[10px] font-bold text-green-600"><i data-lucide="check-circle" class="w-3 h-3 inline"></i> 0 Selesai</span>
                 </div>
 
-                <div class="mb-6 bg-slate-50 rounded-xl border border-slate-200 overflow-hidden">
-                    <div id="listBarungContainer" class="max-h-64 overflow-y-auto divide-y divide-slate-200">
+                <div class="relative mb-3">
+                    <i data-lucide="search" class="absolute left-3 top-2.5 w-4 h-4 text-slate-400"></i>
+                    <input type="text" id="searchBox" onkeyup="filterDaftarBarung()" placeholder="Cari nomor undi atau warna..." class="w-full py-2.5 pl-9 pr-3 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:border-blue-500 text-sm font-semibold text-slate-700 transition-colors">
+                </div>
+
+                <div class="bg-slate-50 rounded-lg border border-slate-200 overflow-hidden">
+                    <div id="listBarungContainer" class="max-h-[55vh] overflow-y-auto divide-y divide-slate-200">
                         </div>
                 </div>
-                
-                <div class="flex justify-between items-center text-xs font-bold text-slate-500 mb-2">
-                    <span id="counterSelesai" class="text-green-600"><i data-lucide="check-circle" class="w-3 h-3 inline"></i> 0 Selesai</span>
-                    <span id="counterSisa" class="text-orange-500"><i data-lucide="clock" class="w-3 h-3 inline"></i> 0 Antri</span>
-                </div>
             </div>
 
-            <div class="text-center text-xs text-slate-400 mt-4">
-                <p>Fitur Cloud Sync aktif.</p>
-                <p>Bisa dikerjakan 2 Juri di pos yang sama. Data aman meski HP direfresh.</p>
-            </div>
         </div>
 
     </div>
 
     <div id="modalRekap" class="fixed inset-0 bg-slate-900/80 z-50 hidden flex flex-col justify-end">
-        <div class="bg-white w-full max-w-md mx-auto h-[80vh] rounded-t-3xl flex flex-col shadow-2xl transform transition-transform translate-y-0">
-            <div class="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50 rounded-t-3xl">
+        <div class="bg-white w-full max-w-md mx-auto h-[75vh] rounded-t-2xl flex flex-col shadow-2xl">
+            <div class="p-3 border-b border-slate-100 flex justify-between items-center bg-slate-50 rounded-t-2xl">
                 <div>
-                    <h3 class="font-bold text-lg text-slate-800">Rekap Sesi Ini</h3>
-                    <p class="text-xs text-slate-500" id="rekapPosName">-</p>
+                    <h3 class="font-bold text-sm text-slate-800">Rekap Sesi Ini</h3>
+                    <p class="text-[10px] text-slate-500" id="rekapPosName">-</p>
                 </div>
-                <button onclick="tutupRekap()" class="p-2 bg-slate-200 rounded-full text-slate-600 btn-click"><i data-lucide="x" class="w-5 h-5"></i></button>
+                <button onclick="tutupRekap()" class="p-1.5 bg-slate-200 rounded-full text-slate-600 btn-click"><i data-lucide="x" class="w-4 h-4"></i></button>
             </div>
             
-            <div class="flex-1 overflow-y-auto p-4 bg-slate-100">
-                <table class="w-full text-sm text-left bg-white rounded-xl shadow-sm overflow-hidden">
-                    <thead class="bg-slate-800 text-white text-xs uppercase">
+            <div class="flex-1 overflow-y-auto p-3 bg-slate-100">
+                <table class="w-full text-xs text-left bg-white rounded-lg shadow-sm overflow-hidden">
+                    <thead class="bg-slate-800 text-white">
                         <tr>
-                            <th class="p-3 w-16 text-center">No</th>
-                            <th class="p-3">Nama Barung</th>
-                            <th class="p-3 text-center">Nilai</th>
+                            <th class="p-2 w-12 text-center">No</th>
+                            <th class="p-2">Barung</th>
+                            <th class="p-2 text-center w-16">Nilai</th>
                         </tr>
                     </thead>
                     <tbody id="tableRekapBody" class="divide-y divide-slate-100">
@@ -155,12 +168,11 @@
         // STATE GLOBAL
         let dbTaman = []; 
         let dbBarung = []; 
-        let serverScores = []; // Data nilai yang ditarik dari server
+        let serverScores = []; 
         let session = JSON.parse(localStorage.getItem('scout_session'));
-        
-        let offlineQueue = []; // Antrian kalau sinyal putus
+        let offlineQueue = []; 
 
-        // 1. INIT
+        // INIT
         window.onload = function() {
             if (session) {
                 tampilkanHalamanInput();
@@ -168,13 +180,11 @@
                 document.getElementById('pageLogin').classList.remove('hidden');
                 fetchMasterData(); 
             }
-            
-            // Interval Sync ke Server (10 detik) untuk fitur 2 Juri & Cloud Save
-            setInterval(syncServerData, 10000);
-            setInterval(processOfflineQueue, 5000);
+            setInterval(syncServerData, 10000); 
+            setInterval(processOfflineQueue, 5000); 
         };
 
-        // 2. MASTER DATA (Buat Login)
+        // LOGIN DATA
         async function fetchMasterData() {
             try {
                 let res = await fetch(API_URL + "?action=getData");
@@ -185,7 +195,7 @@
                     localStorage.setItem('db_taman', JSON.stringify(dbTaman));
                     localStorage.setItem('db_barung', JSON.stringify(dbBarung));
                     renderLoginDropdown();
-                    document.getElementById('statusDot').className = "w-3 h-3 bg-green-500 rounded-full shadow";
+                    document.getElementById('statusDot').className = "w-2.5 h-2.5 bg-green-500 rounded-full shadow";
                 }
             } catch (e) {
                 dbTaman = JSON.parse(localStorage.getItem('db_taman')) || [];
@@ -199,13 +209,12 @@
             dbTaman.forEach(t => { sel.innerHTML += `<option value="${t[0]}">${t[1]}</option>`; });
         }
 
-        // 3. LOGIN
         function selectCategory(cat) {
             document.getElementById('selectedCategory').value = cat;
-            document.getElementById('btnLoginPa').className = "p-4 rounded-xl border-2 border-slate-100 flex flex-col items-center gap-2 opacity-50";
-            document.getElementById('btnLoginPi').className = "p-4 rounded-xl border-2 border-slate-100 flex flex-col items-center gap-2 opacity-50";
-            if(cat === 'Putra') document.getElementById('btnLoginPa').className = "p-4 rounded-xl border-2 border-blue-500 bg-blue-50 flex flex-col items-center gap-2 text-blue-700 shadow-md transform scale-105 opacity-100";
-            else document.getElementById('btnLoginPi').className = "p-4 rounded-xl border-2 border-red-500 bg-red-50 flex flex-col items-center gap-2 text-red-700 shadow-md transform scale-105 opacity-100";
+            document.getElementById('btnLoginPa').className = "py-2.5 rounded-lg border border-slate-200 flex items-center justify-center gap-2 opacity-50";
+            document.getElementById('btnLoginPi').className = "py-2.5 rounded-lg border border-slate-200 flex items-center justify-center gap-2 opacity-50";
+            if(cat === 'Putra') document.getElementById('btnLoginPa').className = "py-2.5 rounded-lg border border-blue-500 bg-blue-50 flex items-center justify-center gap-2 opacity-100 ring-1 ring-blue-200";
+            else document.getElementById('btnLoginPi').className = "py-2.5 rounded-lg border border-red-500 bg-red-50 flex items-center justify-center gap-2 opacity-100 ring-1 ring-red-200";
         }
 
         function doLogin() {
@@ -213,7 +222,7 @@
             let id = document.getElementById('loginTaman').value;
             let pass = document.getElementById('loginPass').value;
             
-            if(!cat || !id || !pass) return Swal.fire('Oops', 'Lengkapi kategori, pos, dan password!', 'warning');
+            if(!cat || !id || !pass) return Swal.fire({toast:true, position:'top', icon:'warning', title:'Lengkapi Data Login', showConfirmButton:false, timer:2000});
             
             if(dbTaman.length === 0) dbTaman = JSON.parse(localStorage.getItem('db_taman')) || [];
             let found = dbTaman.find(t => t[0] == id);
@@ -221,29 +230,27 @@
             if (found && found[2] == pass) {
                 session = { id: found[0], nama: found[1], kategori: cat };
                 localStorage.setItem('scout_session', JSON.stringify(session));
-                Swal.fire({icon: 'success', title: 'Berhasil Masuk', timer: 1000, showConfirmButton: false})
-                .then(() => tampilkanHalamanInput());
+                document.getElementById('pageLogin').classList.add('hidden');
+                tampilkanHalamanInput();
             } else {
-                Swal.fire('Akses Ditolak', 'Data pos belum siap atau Password salah.', 'error');
+                Swal.fire({toast:true, position:'top', icon:'error', title:'Password Salah!', showConfirmButton:false, timer:2000});
             }
         }
 
-        // 4. DASHBOARD & SYNC (MAGIC HAPPENS HERE)
+        // DASHBOARD
         function tampilkanHalamanInput() {
-            document.getElementById('pageLogin').classList.add('hidden');
             document.getElementById('pageInput').classList.remove('hidden');
             document.getElementById('userTamanName').innerText = session.nama;
             document.getElementById('rekapPosName').innerText = session.nama + " (" + session.kategori + ")";
             
             let b = document.getElementById('badgeKategori');
             b.innerText = session.kategori.toUpperCase();
-            b.className = session.kategori === 'Putra' ? "px-2 py-0.5 rounded text-[10px] font-black uppercase bg-blue-100 text-blue-600" : "px-2 py-0.5 rounded text-[10px] font-black uppercase bg-red-100 text-red-600";
+            b.className = session.kategori === 'Putra' ? "px-1.5 py-0.5 rounded text-[9px] font-black uppercase bg-blue-100 text-blue-600" : "px-1.5 py-0.5 rounded text-[9px] font-black uppercase bg-red-100 text-red-600";
             
             dbBarung = JSON.parse(localStorage.getItem('db_barung')) || [];
-            syncServerData(); // Tarik data server saat pertama masuk
+            syncServerData(); 
         }
 
-        // FUNGSI SINKRONISASI CLOUD KE HP
         async function syncServerData() {
             if(!session) return;
             document.getElementById('syncIndicator').classList.remove('hidden');
@@ -251,75 +258,61 @@
                 let res = await fetch(API_URL + "?action=getAdminData");
                 let json = await res.json();
                 if(json.status === "success") {
-                    // Filter data dari server HANYA untuk Pos & Kategori yang sedang login
                     serverScores = json.data.filter(row => {
                         let isPosSama = (row[1] === session.nama);
-                        // Cek gender barung (harus cari referensi di dbBarung karena row[2] cuma nama barung)
                         let bInfo = dbBarung.find(b => b[1] === row[2]);
                         let bGender = bInfo && bInfo[3] ? bInfo[3].toLowerCase() : "";
-                        let isGenderSama = bGender.includes(session.kategori.toLowerCase());
-                        
-                        return isPosSama && isGenderSama;
+                        return isPosSama && bGender.includes(session.kategori.toLowerCase());
                     });
-                    
-                    document.getElementById('statusDot').className = "w-3 h-3 bg-green-500 rounded-full shadow";
-                    renderDaftarBarung(); // Perbarui tampilan list
+                    document.getElementById('statusDot').className = "w-2.5 h-2.5 bg-green-500 rounded-full shadow";
+                    renderDaftarBarung(); 
                 }
             } catch(e) {
-                document.getElementById('statusDot').className = "w-3 h-3 bg-red-500 rounded-full shadow";
-                // Jika offline, tetap render apa adanya (pakai data lama/kosong)
+                document.getElementById('statusDot').className = "w-2.5 h-2.5 bg-red-500 rounded-full shadow";
                 renderDaftarBarung();
             } finally {
                 document.getElementById('syncIndicator').classList.add('hidden');
             }
         }
 
-        // 5. RENDER LIST BARUNG & PENCARIAN
+        // RENDER LIST
         function renderDaftarBarung() {
             let container = document.getElementById('listBarungContainer');
             container.innerHTML = "";
             let keyword = document.getElementById('searchBox').value.toLowerCase();
             
-            // Ambil semua barung sesuai kategori sesi ini
             let listSesi = dbBarung.filter(b => (b[3]||"").toLowerCase().includes(session.kategori.toLowerCase()));
-            
-            // Sort by Nomor Undi
             listSesi.sort((a,b) => String(a[0]).localeCompare(String(b[0]), undefined, {numeric: true}));
 
-            let countSelesai = 0;
-            let countSisa = 0;
+            let countSelesai = 0; let countSisa = 0;
 
             listSesi.forEach(b => {
-                let noId = b[0];
-                let namaBarung = b[1];
-                let sekolah = b[2];
+                let noId = b[0]; let namaBarung = b[1]; let sekolah = b[2];
 
-                // Pencarian
                 if(keyword && !String(noId).toLowerCase().includes(keyword) && !namaBarung.toLowerCase().includes(keyword)) return;
 
-                // Cek apakah barung ini ada di data server (Sudah Dinilai)
                 let scoreRecord = serverScores.find(r => r[2] === namaBarung);
                 let isScored = scoreRecord ? true : false;
                 let currentScore = isScored ? scoreRecord[4] : null;
 
                 if(isScored) countSelesai++; else countSisa++;
 
-                // Desain Baris
-                let bgClass = isScored ? "bg-green-50" : "bg-white hover:bg-slate-50";
-                let textClass = isScored ? "text-green-700" : "text-slate-700";
+                let bgClass = isScored ? "bg-green-50/50" : "bg-white hover:bg-slate-100";
+                let textClass = isScored ? "text-green-800" : "text-slate-700";
+                
                 let actionBtn = isScored 
-                    ? `<button onclick="bukaInputNilai('${noId}', '${namaBarung}', '${sekolah}', true, ${currentScore})" class="px-3 py-1.5 bg-green-600 text-white text-xs font-bold rounded-lg btn-click shadow-sm flex items-center gap-1"><i data-lucide="edit-2" class="w-3 h-3"></i> Edit (Nilai: ${currentScore})</button>`
-                    : `<button onclick="bukaInputNilai('${noId}', '${namaBarung}', '${sekolah}', false, 0)" class="px-4 py-2 bg-blue-600 text-white text-xs font-bold rounded-lg btn-click shadow-md">NILAI SEKARANG</button>`;
+                    ? `<button onclick="bukaInputNilai('${noId}', '${namaBarung}', '${sekolah}', true, ${currentScore})" class="px-2.5 py-1.5 bg-green-100 text-green-700 border border-green-200 rounded-lg btn-click font-bold text-[10px] flex items-center gap-1 shadow-sm"><i data-lucide="edit-3" class="w-3 h-3"></i> ${currentScore}</button>`
+                    : `<button onclick="bukaInputNilai('${noId}', '${namaBarung}', '${sekolah}', false, 0)" class="px-3 py-1.5 bg-blue-600 text-white rounded-lg btn-click font-bold text-xs shadow-md">NILAI</button>`;
 
                 let html = `
-                    <div class="p-4 ${bgClass} flex justify-between items-center transition-colors">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-xl flex items-center justify-center font-black text-lg ${isScored ? 'bg-green-200 text-green-700' : 'bg-slate-200 text-slate-600'}">
+                    <div class="p-2.5 ${bgClass} flex justify-between items-center transition-colors">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-8 h-8 rounded-lg flex items-center justify-center font-black text-sm ${isScored ? 'bg-green-200 text-green-700' : 'bg-slate-200 text-slate-600'}">
                                 ${noId}
                             </div>
-                            <div>
-                                <h4 class="font-bold text-base ${textClass}">${namaBarung}</h4>
-                                <p class="text-[10px] ${isScored ? 'text-green-600 font-bold' : 'text-slate-400'} uppercase">${isScored ? 'Selesai Dinilai' : 'Belum Dinilai'}</p>
+                            <div class="leading-tight">
+                                <h4 class="font-bold text-sm ${textClass}">${namaBarung}</h4>
+                                <p class="text-[9px] ${isScored ? 'text-green-600 font-bold' : 'text-slate-400'} uppercase mt-0.5">${isScored ? 'Selesai' : 'Belum'}</p>
                             </div>
                         </div>
                         <div>${actionBtn}</div>
@@ -329,23 +322,27 @@
             });
             
             document.getElementById('counterSelesai').innerHTML = `<i data-lucide="check-circle" class="w-3 h-3 inline"></i> ${countSelesai} Selesai`;
-            document.getElementById('counterSisa').innerHTML = `<i data-lucide="clock" class="w-3 h-3 inline"></i> ${countSisa} Antri`;
+            document.getElementById('counterSisa').innerHTML = `<i data-lucide="list" class="w-3 h-3 inline"></i> ${countSisa} Antri`;
             lucide.createIcons();
         }
 
         function filterDaftarBarung() { renderDaftarBarung(); }
 
-        // 6. POPUP INPUT NILAI (REPLACEMENT DROP-DOWN)
+        // INPUT NILAI (DI TENGAH & PROPORSIONAL)
         function bukaInputNilai(idBarung, namaBarung, sekolah, isEdit, oldScore) {
-            let titleText = isEdit ? `REVISI NILAI: ${idBarung} - ${namaBarung}` : `INPUT NILAI: ${idBarung} - ${namaBarung}`;
+            let titleText = isEdit ? `REVISI: No. ${idBarung}` : `NILAI: No. ${idBarung}`;
             let btnText = isEdit ? `SIMPAN REVISI` : `KIRIM NILAI`;
             let btnColor = isEdit ? '#f59e0b' : '#16a34a';
 
+            // HTML Custom: Flexbox justify-center agar posisi kotak input pasti di tengah
             Swal.fire({
                 title: titleText,
                 html: `
-                    <p class="text-xs text-slate-500 mb-4">Masukkan rentang nilai 0 - 100</p>
-                    <input type="number" id="swalInputNilai" class="swal2-input text-center text-5xl font-black text-blue-600 !mt-0" value="${isEdit ? oldScore : ''}" placeholder="0">
+                    <p class="text-sm font-bold text-slate-600 mb-4">${namaBarung}</p>
+                    <div class="flex justify-center mb-2">
+                        <input type="number" id="swalInputNilai" class="w-32 h-16 text-center text-4xl font-black text-blue-600 border-2 border-slate-300 rounded-xl outline-none focus:border-blue-500 focus:bg-white bg-slate-50 shadow-inner transition-colors" value="${isEdit ? oldScore : ''}" placeholder="0" inputmode="numeric">
+                    </div>
+                    <p class="text-[10px] text-slate-400 mt-2">Rentang nilai 0 - 100</p>
                 `,
                 showCancelButton: true,
                 confirmButtonText: btnText,
@@ -354,6 +351,7 @@
                 preConfirm: () => {
                     const nilai = document.getElementById('swalInputNilai').value;
                     if (!nilai) { Swal.showValidationMessage('Nilai wajib diisi!'); return false; }
+                    if (nilai < 0 || nilai > 100) { Swal.showValidationMessage('Nilai harus 0 - 100'); return false; }
                     return nilai;
                 }
             }).then((result) => {
@@ -361,9 +359,12 @@
                     kirimDataServer(idBarung, namaBarung, sekolah, result.value, isEdit);
                 }
             });
+            
+            // Auto fokus ke kolom nilai (membantu juri biar tidak perlu tap 2 kali)
+            setTimeout(() => document.getElementById('swalInputNilai').focus(), 100);
         }
 
-        // 7. PROSES KIRIM DATA
+        // PROSES KIRIM
         function kirimDataServer(idBarung, namaBarung, sekolah, nilai, isEdit) {
             let paket = {
                 uid: Date.now(),
@@ -373,25 +374,21 @@
                 namaBarung: namaBarung,
                 pangkalan: sekolah,
                 nilai: nilai,
-                action: 'input' // Akan meng-update di backend jika kunci sudah ada
+                action: 'input' 
             };
 
-            // Masukkan antrian offline
             offlineQueue.push(paket);
-            processOfflineQueue(); // Langsung coba kirim
-
-            // Tampilkan info langsung
-            document.getElementById('searchBox').value = ''; // Reset pencarian
+            processOfflineQueue(); 
             
-            // Visual feedback local
+            document.getElementById('searchBox').value = ''; 
+            
             Swal.fire({
                 toast: true, position: 'top', icon: 'success', 
-                title: isEdit ? 'Revisi diproses...' : 'Nilai diproses...', 
-                showConfirmButton: false, timer: 2000
+                title: isEdit ? 'Revisi diproses' : 'Nilai diproses', 
+                showConfirmButton: false, timer: 1500
             });
             
-            // Langsung panggil sync agar UI cepat update (pura-pura cepat)
-            setTimeout(syncServerData, 1000);
+            setTimeout(syncServerData, 500); // UI langsung terasa update
         }
 
         async function processOfflineQueue() {
@@ -401,49 +398,47 @@
                 await fetch(API_URL, {
                     method: 'POST', mode: 'no-cors', headers: { "Content-Type": "text/plain" }, body: JSON.stringify(item)
                 });
-                offlineQueue.shift(); // Hapus kalau sukses
-                syncServerData(); // Update data real dari server
+                offlineQueue.shift(); 
+                syncServerData(); 
             } catch (err) {
-                console.log("Antri di background...");
+                console.log("Menunggu koneksi...");
             }
         }
 
-        // 8. REKAP JURI
+        // REKAP
         function tampilkanRekap() {
             document.getElementById('modalRekap').classList.remove('hidden');
             let tbody = document.getElementById('tableRekapBody');
             tbody.innerHTML = "";
             
             if(serverScores.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="3" class="text-center p-4 text-slate-500">Belum ada nilai terinput.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="3" class="text-center p-4 text-slate-400 text-xs">Belum ada data yang tersimpan</td></tr>`;
                 return;
             }
 
-            // Urutkan rekap berdasarkan waktu input terbaru
             let sortedScores = [...serverScores].sort((a,b) => new Date(b[0]) - new Date(a[0]));
 
-            sortedScores.forEach((row, i) => {
-                // Cari Nomor Undi
+            sortedScores.forEach((row) => {
                 let bInfo = dbBarung.find(b => b[1] === row[2]);
                 let noUndi = bInfo ? bInfo[0] : "-";
-
                 tbody.innerHTML += `
                     <tr>
-                        <td class="p-3 text-center font-bold text-slate-400 border-r border-slate-100">${noUndi}</td>
-                        <td class="p-3 font-bold text-slate-700">${row[2]}<br><span class="text-[10px] text-slate-400 font-normal">Terkirim</span></td>
-                        <td class="p-3 text-center font-black text-blue-600 text-lg border-l border-slate-100">${row[4]}</td>
+                        <td class="p-2 text-center font-bold text-slate-400 border-r border-slate-100">${noUndi}</td>
+                        <td class="p-2 font-bold text-slate-700 leading-tight">${row[2]}<br><span class="text-[9px] text-green-500 font-bold"><i data-lucide="check" class="w-2 h-2 inline"></i> Terkirim</span></td>
+                        <td class="p-2 text-center font-black text-blue-600 text-base border-l border-slate-100">${row[4]}</td>
                     </tr>
                 `;
             });
+            lucide.createIcons();
         }
 
         function tutupRekap() { document.getElementById('modalRekap').classList.add('hidden'); }
 
-        // 9. LOGOUT
+        // LOGOUT
         function doLogout() {
             Swal.fire({
-                title: 'Akhiri Tugas?',
-                text: "Anda harus login ulang untuk menilai.",
+                title: 'Ganti Pos / Keluar?',
+                text: "Anda akan kembali ke menu login.",
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#ef4444',
