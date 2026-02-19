@@ -4,173 +4,177 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Juri - ScoutLive</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⛺</text></svg>">
-    
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
     <style>
         body { -webkit-tap-highlight-color: transparent; }
-        .btn-active:active { transform: scale(0.95); transition: 0.1s; }
-        select { font-family: sans-serif; }
+        .btn-click:active { transform: scale(0.97); }
+        .swal2-popup { border-radius: 1rem !important; }
         
-        /* SweetAlert Style */
-        .swal2-popup { border-radius: 1rem !important; padding: 1.5rem !important; }
-        .swal2-title { font-size: 1.25rem !important; color: #1e293b !important; }
-        .swal2-confirm, .swal2-cancel { border-radius: 0.5rem !important; font-weight: bold !important; }
+        /* Custom Scrollbar untuk Modal */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
     </style>
 </head>
-<body class="bg-gray-100 font-sans text-gray-800">
+<body class="bg-slate-100 font-sans text-slate-800 pb-20">
 
     <script>
+        // PASTE URL API ANDA DI BAWAH INI (Harus hasil Deploy V6 terbaru)
         const API_URL = "https://script.google.com/macros/s/AKfycbyfB19FroqDqmvn7JfSjxNQ03NzPB6_dgajXxGms_bwD51-Crhet615fcWG3xJVC4Uv/exec"; 
     </script>
 
-    <div class="fixed top-0 left-0 right-0 bg-slate-900 text-white z-50 shadow-md">
+    <div class="fixed top-0 left-0 right-0 bg-slate-900 text-white z-40 shadow-lg">
         <div class="max-w-md mx-auto px-4 h-14 flex justify-between items-center">
             <div class="flex items-center gap-2 font-bold text-lg">
                 <i data-lucide="tent" class="w-5 h-5 text-yellow-400"></i> Juri<span class="text-yellow-400">App</span>
             </div>
-            <div class="flex items-center gap-3 text-xs">
-                <div id="queueBadge" class="hidden bg-orange-500 px-2 py-1 rounded-full font-bold shadow-sm">
-                    Antri: <span id="queueCount">0</span>
+            <div class="flex items-center gap-2">
+                <div id="syncIndicator" class="text-[10px] text-slate-400 flex items-center gap-1 hidden">
+                    <i data-lucide="refresh-cw" class="w-3 h-3 animate-spin"></i> Sync...
                 </div>
                 <div id="statusDot" class="w-3 h-3 bg-gray-400 rounded-full border-2 border-white shadow"></div>
             </div>
         </div>
     </div>
 
-    <div class="max-w-md mx-auto pt-20 pb-10 px-4 min-h-screen">
+    <div class="max-w-md mx-auto pt-20 px-4">
 
         <div id="pageLogin" class="hidden">
-            <div class="bg-white p-6 rounded-2xl shadow-xl border border-gray-100">
+            <div class="bg-white p-6 rounded-2xl shadow-lg border border-slate-200">
                 <div class="text-center mb-6">
                     <div class="bg-slate-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3">
-                        <i data-lucide="shield-check" class="w-8 h-8 text-slate-600"></i>
+                        <i data-lucide="user-check" class="w-8 h-8 text-slate-600"></i>
                     </div>
-                    <h2 class="text-xl font-bold text-slate-800">Login Petugas</h2>
-                    <p class="text-xs text-gray-400">Atur sesi penilaian Anda</p>
+                    <h2 class="text-xl font-bold text-slate-800">Sesi Penilaian</h2>
                 </div>
                 
-                <div class="space-y-5">
-                    <div>
-                        <label class="block text-xs font-bold uppercase text-gray-400 mb-2">Kategori (Wajib)</label>
-                        <div class="grid grid-cols-2 gap-3">
-                            <button onclick="selectCategory('Putra')" id="btnLoginPa" class="p-4 rounded-xl border-2 border-slate-100 flex flex-col items-center justify-center gap-2 hover:bg-blue-50 transition-all opacity-60">
-                                <div class="bg-blue-100 p-2 rounded-full text-blue-600"><i data-lucide="user" class="w-6 h-6"></i></div>
-                                <span class="font-bold text-slate-600">PUTRA</span>
-                            </button>
-                            <button onclick="selectCategory('Putri')" id="btnLoginPi" class="p-4 rounded-xl border-2 border-slate-100 flex flex-col items-center justify-center gap-2 hover:bg-red-50 transition-all opacity-60">
-                                <div class="bg-red-100 p-2 rounded-full text-red-600"><i data-lucide="user-check" class="w-6 h-6"></i></div>
-                                <span class="font-bold text-slate-600">PUTRI</span>
-                            </button>
-                        </div>
-                        <input type="hidden" id="selectedCategory" value="">
+                <div class="space-y-4">
+                    <div class="grid grid-cols-2 gap-3">
+                        <button onclick="selectCategory('Putra')" id="btnLoginPa" class="p-4 rounded-xl border-2 border-slate-100 flex flex-col items-center gap-2 opacity-60">
+                            <div class="bg-blue-100 p-2 rounded-full text-blue-600"><i data-lucide="user" class="w-6 h-6"></i></div>
+                            <span class="font-bold text-slate-600">PUTRA</span>
+                        </button>
+                        <button onclick="selectCategory('Putri')" id="btnLoginPi" class="p-4 rounded-xl border-2 border-slate-100 flex flex-col items-center gap-2 opacity-60">
+                            <div class="bg-red-100 p-2 rounded-full text-red-600"><i data-lucide="user-check" class="w-6 h-6"></i></div>
+                            <span class="font-bold text-slate-600">PUTRI</span>
+                        </button>
                     </div>
+                    <input type="hidden" id="selectedCategory" value="">
 
-                    <div>
-                        <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Pilih Pos / Taman</label>
-                        <div class="relative">
-                            <select id="loginTaman" class="w-full p-4 bg-gray-50 border-2 border-gray-200 rounded-xl outline-none focus:border-slate-800 font-bold text-slate-700">
-                                <option value="">Memuat data...</option>
-                            </select>
-                            <i data-lucide="chevron-down" class="absolute right-4 top-4 w-5 h-5 text-gray-400 pointer-events-none"></i>
-                        </div>
-                    </div>
+                    <select id="loginTaman" class="w-full p-4 bg-slate-50 border-2 border-slate-200 rounded-xl outline-none focus:border-slate-800 font-bold text-slate-700">
+                        <option value="">Memuat Pos...</option>
+                    </select>
 
-                    <div>
-                        <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Kode Akses</label>
-                        <input type="text" id="loginPass" placeholder="******" class="w-full p-4 bg-gray-50 border-2 border-gray-200 rounded-xl outline-none focus:border-slate-800 font-bold text-center tracking-widest text-lg">
-                    </div>
+                    <input type="text" id="loginPass" placeholder="KODE POS / PASSWORD" class="w-full p-4 bg-slate-50 border-2 border-slate-200 rounded-xl outline-none focus:border-slate-800 font-bold text-center tracking-widest">
 
-                    <button onclick="doLogin()" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-4 rounded-xl btn-active shadow-lg text-lg flex justify-center items-center gap-2">
-                        <span>MASUK POS</span> <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                    <button onclick="doLogin()" class="w-full bg-slate-800 text-white font-bold py-4 rounded-xl btn-click flex justify-center items-center gap-2">
+                        MASUK <i data-lucide="arrow-right" class="w-5 h-5"></i>
                     </button>
                 </div>
             </div>
         </div>
 
-        <div id="pageInput" class="hidden">
-            <div class="flex justify-between items-center mb-4 px-1">
+        <div id="pageInput" class="hidden space-y-4">
+            
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex justify-between items-center">
                 <div>
-                    <div class="flex items-center gap-2">
-                        <span id="badgeKategori" class="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-slate-200 text-slate-600">-</span>
-                        <p class="text-[10px] text-gray-400 uppercase font-bold tracking-wider">Pos Penilaian:</p>
-                    </div>
-                    <h2 id="userTamanName" class="text-lg font-bold text-slate-800 leading-tight">...</h2>
+                    <span id="badgeKategori" class="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-slate-200">-</span>
+                    <h2 id="userTamanName" class="text-lg font-bold text-slate-800 leading-tight mt-1">...</h2>
                 </div>
-                <button onclick="doLogout()" class="bg-white text-red-500 p-2.5 rounded-xl border border-red-100 shadow-sm hover:bg-red-50 active:scale-95 transition">
-                    <i data-lucide="log-out" class="w-5 h-5"></i>
-                </button>
+                <div class="flex gap-2">
+                    <button onclick="tampilkanRekap()" class="bg-blue-50 text-blue-600 p-2.5 rounded-xl border border-blue-100 hover:bg-blue-100 btn-click" title="Lihat Rekap Saya">
+                        <i data-lucide="file-text" class="w-5 h-5"></i>
+                    </button>
+                    <button onclick="doLogout()" class="bg-red-50 text-red-600 p-2.5 rounded-xl border border-red-100 hover:bg-red-100 btn-click" title="Keluar">
+                        <i data-lucide="log-out" class="w-5 h-5"></i>
+                    </button>
+                </div>
             </div>
 
-            <div class="bg-white p-5 rounded-2xl shadow-xl border border-gray-100 mb-6 relative overflow-hidden">
+            <div class="bg-white p-5 rounded-2xl shadow-lg border border-slate-200 relative overflow-hidden">
                 <div class="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-blue-50 rounded-full blur-2xl opacity-50 pointer-events-none"></div>
 
-                <div class="bg-blue-50 p-3 rounded-lg mb-5 text-xs text-blue-800 flex items-start gap-2 border border-blue-100">
-                    <i data-lucide="info" class="w-4 h-4 mt-0.5 flex-shrink-0 text-blue-600"></i>
-                    <p>Cocokkan <b>NOMOR UNDI</b> di dada peserta.</p>
-                </div>
-
-                <div class="mb-5">
-                    <label class="block text-xs font-bold uppercase text-gray-400 mb-1 ml-1">Nomor & Warna Barung</label>
+                <div class="mb-4">
+                    <label class="block text-xs font-bold uppercase text-slate-400 mb-2">Cari Barung (No / Warna)</label>
                     <div class="relative">
-                        <select id="inputBarung" class="w-full p-4 pl-5 text-xl font-black border-2 border-gray-200 rounded-xl bg-white outline-none focus:border-blue-500 text-slate-800 tracking-wide shadow-sm">
-                            <option value="">-- Pilih Peserta --</option>
-                        </select>
-                        <div class="absolute right-4 top-4 bg-gray-100 p-1 rounded-md pointer-events-none">
-                            <i data-lucide="chevron-down" class="w-5 h-5 text-gray-500"></i>
-                        </div>
+                        <i data-lucide="search" class="absolute left-4 top-4 w-5 h-5 text-slate-400"></i>
+                        <input type="text" id="searchBox" onkeyup="filterDaftarBarung()" placeholder="Ketik nomor atau warna..." class="w-full p-4 pl-12 bg-slate-50 border-2 border-slate-200 rounded-xl outline-none focus:border-blue-500 font-bold text-slate-700 transition-colors">
                     </div>
-                    <p id="barungCount" class="text-xs text-right text-blue-600 mt-1.5 font-medium italic pr-1">Memuat...</p>
                 </div>
 
-                <div class="mb-6">
-                    <label class="block text-xs font-bold uppercase text-gray-400 mb-1 ml-1">Nilai (0-100)</label>
-                    <input type="number" id="inputNilai" inputmode="numeric" placeholder="0" class="w-full p-4 text-center text-5xl font-black text-blue-600 border-2 border-gray-200 rounded-xl outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-50 placeholder-gray-200 shadow-inner bg-gray-50 focus:bg-white">
+                <div class="mb-6 bg-slate-50 rounded-xl border border-slate-200 overflow-hidden">
+                    <div id="listBarungContainer" class="max-h-64 overflow-y-auto divide-y divide-slate-200">
+                        </div>
                 </div>
-
-                <button onclick="konfirmasiKirim()" class="w-full bg-green-600 hover:bg-green-700 text-white text-lg font-bold py-4 rounded-xl shadow-lg shadow-green-200 btn-active flex justify-center items-center gap-2">
-                    <i data-lucide="send" class="w-5 h-5"></i> KIRIM NILAI
-                </button>
+                
+                <div class="flex justify-between items-center text-xs font-bold text-slate-500 mb-2">
+                    <span id="counterSelesai" class="text-green-600"><i data-lucide="check-circle" class="w-3 h-3 inline"></i> 0 Selesai</span>
+                    <span id="counterSisa" class="text-orange-500"><i data-lucide="clock" class="w-3 h-3 inline"></i> 0 Antri</span>
+                </div>
             </div>
 
-            <div>
-                <div class="flex items-center justify-between px-1 mb-3">
-                    <h3 class="text-xs font-bold text-gray-400 uppercase">Sudah Dinilai (Sesi Ini)</h3>
-                    <span class="text-[10px] bg-gray-200 px-2 py-0.5 rounded text-gray-500" id="histCount">0</span>
-                </div>
-                <div id="historyList" class="space-y-2 pb-20"></div>
+            <div class="text-center text-xs text-slate-400 mt-4">
+                <p>Fitur Cloud Sync aktif.</p>
+                <p>Bisa dikerjakan 2 Juri di pos yang sama. Data aman meski HP direfresh.</p>
             </div>
         </div>
 
     </div>
 
+    <div id="modalRekap" class="fixed inset-0 bg-slate-900/80 z-50 hidden flex flex-col justify-end">
+        <div class="bg-white w-full max-w-md mx-auto h-[80vh] rounded-t-3xl flex flex-col shadow-2xl transform transition-transform translate-y-0">
+            <div class="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50 rounded-t-3xl">
+                <div>
+                    <h3 class="font-bold text-lg text-slate-800">Rekap Sesi Ini</h3>
+                    <p class="text-xs text-slate-500" id="rekapPosName">-</p>
+                </div>
+                <button onclick="tutupRekap()" class="p-2 bg-slate-200 rounded-full text-slate-600 btn-click"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            
+            <div class="flex-1 overflow-y-auto p-4 bg-slate-100">
+                <table class="w-full text-sm text-left bg-white rounded-xl shadow-sm overflow-hidden">
+                    <thead class="bg-slate-800 text-white text-xs uppercase">
+                        <tr>
+                            <th class="p-3 w-16 text-center">No</th>
+                            <th class="p-3">Nama Barung</th>
+                            <th class="p-3 text-center">Nilai</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableRekapBody" class="divide-y divide-slate-100">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
     <script>
         lucide.createIcons();
 
-        // STATE
+        // STATE GLOBAL
         let dbTaman = []; 
         let dbBarung = []; 
+        let serverScores = []; // Data nilai yang ditarik dari server
         let session = JSON.parse(localStorage.getItem('scout_session'));
-        let queue = JSON.parse(localStorage.getItem('scout_queue')) || [];
-        let assessedIds = JSON.parse(localStorage.getItem('scout_assessed')) || [];
-        let sessionHistory = JSON.parse(localStorage.getItem('scout_history')) || [];
+        
+        let offlineQueue = []; // Antrian kalau sinyal putus
 
-        // INIT
+        // 1. INIT
         window.onload = function() {
-            updateQueueUI();
             if (session) {
                 tampilkanHalamanInput();
             } else {
                 document.getElementById('pageLogin').classList.remove('hidden');
                 fetchMasterData(); 
             }
-            setInterval(processQueue, 2000);
+            
+            // Interval Sync ke Server (10 detik) untuk fitur 2 Juri & Cloud Save
+            setInterval(syncServerData, 10000);
+            setInterval(processOfflineQueue, 5000);
         };
 
-        // DATA
+        // 2. MASTER DATA (Buat Login)
         async function fetchMasterData() {
             try {
                 let res = await fetch(API_URL + "?action=getData");
@@ -181,12 +185,10 @@
                     localStorage.setItem('db_taman', JSON.stringify(dbTaman));
                     localStorage.setItem('db_barung', JSON.stringify(dbBarung));
                     renderLoginDropdown();
-                    document.getElementById('statusDot').className = "w-3 h-3 bg-green-500 rounded-full border-2 border-white shadow";
+                    document.getElementById('statusDot').className = "w-3 h-3 bg-green-500 rounded-full shadow";
                 }
             } catch (e) {
-                console.log("Offline");
                 dbTaman = JSON.parse(localStorage.getItem('db_taman')) || [];
-                dbBarung = JSON.parse(localStorage.getItem('db_barung')) || [];
                 renderLoginDropdown();
             }
         }
@@ -194,26 +196,16 @@
         function renderLoginDropdown() {
             let sel = document.getElementById('loginTaman');
             sel.innerHTML = '<option value="">-- Pilih Pos Anda --</option>';
-            dbTaman.forEach(t => {
-                let opt = document.createElement('option');
-                opt.value = t[0]; opt.text = t[1]; sel.appendChild(opt);
-            });
+            dbTaman.forEach(t => { sel.innerHTML += `<option value="${t[0]}">${t[1]}</option>`; });
         }
 
-        // LOGIN
+        // 3. LOGIN
         function selectCategory(cat) {
             document.getElementById('selectedCategory').value = cat;
-            const btnPa = document.getElementById('btnLoginPa');
-            const btnPi = document.getElementById('btnLoginPi');
-            
-            btnPa.className = "p-4 rounded-xl border-2 border-slate-100 flex flex-col items-center justify-center gap-2 hover:bg-blue-50 transition-all opacity-50";
-            btnPi.className = "p-4 rounded-xl border-2 border-slate-100 flex flex-col items-center justify-center gap-2 hover:bg-red-50 transition-all opacity-50";
-            
-            if(cat === 'Putra') {
-                btnPa.className = "p-4 rounded-xl border-2 border-blue-500 bg-blue-50 flex flex-col items-center justify-center gap-2 text-blue-700 shadow-md transform scale-105 opacity-100 ring-2 ring-blue-200";
-            } else {
-                btnPi.className = "p-4 rounded-xl border-2 border-red-500 bg-red-50 flex flex-col items-center justify-center gap-2 text-red-700 shadow-md transform scale-105 opacity-100 ring-2 ring-red-200";
-            }
+            document.getElementById('btnLoginPa').className = "p-4 rounded-xl border-2 border-slate-100 flex flex-col items-center gap-2 opacity-50";
+            document.getElementById('btnLoginPi').className = "p-4 rounded-xl border-2 border-slate-100 flex flex-col items-center gap-2 opacity-50";
+            if(cat === 'Putra') document.getElementById('btnLoginPa').className = "p-4 rounded-xl border-2 border-blue-500 bg-blue-50 flex flex-col items-center gap-2 text-blue-700 shadow-md transform scale-105 opacity-100";
+            else document.getElementById('btnLoginPi').className = "p-4 rounded-xl border-2 border-red-500 bg-red-50 flex flex-col items-center gap-2 text-red-700 shadow-md transform scale-105 opacity-100";
         }
 
         function doLogin() {
@@ -221,206 +213,244 @@
             let id = document.getElementById('loginTaman').value;
             let pass = document.getElementById('loginPass').value;
             
-            if(!cat) return Swal.fire({icon:'warning', title:'Pilih Kategori', text:'Klik tombol Putra atau Putri', confirmButtonColor:'#334155'});
-            if(!id) return Swal.fire({icon:'warning', title:'Pilih Pos', text:'Pos belum dipilih', confirmButtonColor:'#334155'});
-            if(!pass) return Swal.fire({icon:'warning', title:'Password Kosong', text:'Masukkan kode akses', confirmButtonColor:'#334155'});
-
+            if(!cat || !id || !pass) return Swal.fire('Oops', 'Lengkapi kategori, pos, dan password!', 'warning');
+            
             if(dbTaman.length === 0) dbTaman = JSON.parse(localStorage.getItem('db_taman')) || [];
             let found = dbTaman.find(t => t[0] == id);
-            if (!found) return Swal.fire('Error', 'Data Pos belum siap.', 'error');
-
-            if (found[2] == pass) {
+            
+            if (found && found[2] == pass) {
                 session = { id: found[0], nama: found[1], kategori: cat };
                 localStorage.setItem('scout_session', JSON.stringify(session));
-                Swal.fire({
-                    icon: 'success', title: 'Berhasil Masuk', text: 'Selamat Bertugas!',
-                    timer: 1000, showConfirmButton: false
-                }).then(() => tampilkanHalamanInput());
+                Swal.fire({icon: 'success', title: 'Berhasil Masuk', timer: 1000, showConfirmButton: false})
+                .then(() => tampilkanHalamanInput());
             } else {
-                Swal.fire({icon:'error', title:'Gagal', text:'Password Salah!', confirmButtonColor:'#d33'});
+                Swal.fire('Akses Ditolak', 'Data pos belum siap atau Password salah.', 'error');
             }
         }
 
-        // DASHBOARD
+        // 4. DASHBOARD & SYNC (MAGIC HAPPENS HERE)
         function tampilkanHalamanInput() {
             document.getElementById('pageLogin').classList.add('hidden');
             document.getElementById('pageInput').classList.remove('hidden');
             document.getElementById('userTamanName').innerText = session.nama;
+            document.getElementById('rekapPosName').innerText = session.nama + " (" + session.kategori + ")";
             
-            let badge = document.getElementById('badgeKategori');
-            badge.innerText = session.kategori.toUpperCase();
-            if(session.kategori === 'Putra') {
-                badge.className = "px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-blue-100 text-blue-600 border border-blue-200 shadow-sm";
-            } else {
-                badge.className = "px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-red-100 text-red-600 border border-red-200 shadow-sm";
-            }
+            let b = document.getElementById('badgeKategori');
+            b.innerText = session.kategori.toUpperCase();
+            b.className = session.kategori === 'Putra' ? "px-2 py-0.5 rounded text-[10px] font-black uppercase bg-blue-100 text-blue-600" : "px-2 py-0.5 rounded text-[10px] font-black uppercase bg-red-100 text-red-600";
             
-            renderHistoryFromStorage();
-            loadBarungBySession();
-        }
-
-        function loadBarungBySession() {
             dbBarung = JSON.parse(localStorage.getItem('db_barung')) || [];
-            let sel = document.getElementById('inputBarung');
-            sel.innerHTML = '<option value="">-- Pilih Peserta --</option>';
-            
-            let filtered = dbBarung.filter(b => {
-                let g = b[3] ? String(b[3]).toLowerCase() : "";
-                return g.includes(session.kategori.toLowerCase());
-            });
-
-            let remaining = filtered.filter(b => !assessedIds.includes(b[0]));
-            remaining.sort((a,b) => String(a[0]).localeCompare(String(b[0]), undefined, {numeric: true, sensitivity: 'base'}));
-
-            remaining.forEach(b => {
-                let opt = document.createElement('option');
-                opt.value = JSON.stringify({id: b[0], nama: b[1], sekolah: b[2]});
-                opt.text = b[0] + ' - ' + b[1]; 
-                sel.appendChild(opt);
-            });
-
-            document.getElementById('barungCount').innerText = remaining.length + " Regu Tersedia";
-            if(remaining.length === 0) document.getElementById('barungCount').innerText = "Semua Selesai! 🎉";
+            syncServerData(); // Tarik data server saat pertama masuk
         }
 
-        // KIRIM
-        function konfirmasiKirim() {
-            let barungVal = document.getElementById('inputBarung').value;
-            let nilai = document.getElementById('inputNilai').value;
-
-            if (!barungVal || nilai === "") { 
-                return Swal.fire({icon:'warning', title:'Belum Lengkap', text:'Pilih Peserta & Isi Nilai', confirmButtonColor:'#334155'}); 
+        // FUNGSI SINKRONISASI CLOUD KE HP
+        async function syncServerData() {
+            if(!session) return;
+            document.getElementById('syncIndicator').classList.remove('hidden');
+            try {
+                let res = await fetch(API_URL + "?action=getAdminData");
+                let json = await res.json();
+                if(json.status === "success") {
+                    // Filter data dari server HANYA untuk Pos & Kategori yang sedang login
+                    serverScores = json.data.filter(row => {
+                        let isPosSama = (row[1] === session.nama);
+                        // Cek gender barung (harus cari referensi di dbBarung karena row[2] cuma nama barung)
+                        let bInfo = dbBarung.find(b => b[1] === row[2]);
+                        let bGender = bInfo && bInfo[3] ? bInfo[3].toLowerCase() : "";
+                        let isGenderSama = bGender.includes(session.kategori.toLowerCase());
+                        
+                        return isPosSama && isGenderSama;
+                    });
+                    
+                    document.getElementById('statusDot').className = "w-3 h-3 bg-green-500 rounded-full shadow";
+                    renderDaftarBarung(); // Perbarui tampilan list
+                }
+            } catch(e) {
+                document.getElementById('statusDot').className = "w-3 h-3 bg-red-500 rounded-full shadow";
+                // Jika offline, tetap render apa adanya (pakai data lama/kosong)
+                renderDaftarBarung();
+            } finally {
+                document.getElementById('syncIndicator').classList.add('hidden');
             }
+        }
+
+        // 5. RENDER LIST BARUNG & PENCARIAN
+        function renderDaftarBarung() {
+            let container = document.getElementById('listBarungContainer');
+            container.innerHTML = "";
+            let keyword = document.getElementById('searchBox').value.toLowerCase();
             
-            let barungData = JSON.parse(barungVal);
+            // Ambil semua barung sesuai kategori sesi ini
+            let listSesi = dbBarung.filter(b => (b[3]||"").toLowerCase().includes(session.kategori.toLowerCase()));
             
-            let htmlContent = '<div class="text-left bg-gray-50 p-3 rounded border">';
-            htmlContent += '<p class="text-xs text-gray-500">NOMOR</p><p class="font-bold text-lg mb-2">' + barungData.id + '</p>';
-            htmlContent += '<p class="text-xs text-gray-500">BARUNG</p><p class="font-bold text-lg mb-2">' + barungData.nama + '</p>';
-            htmlContent += '<div class="text-center mt-4 border-t pt-2"><p class="text-xs text-gray-400">NILAI</p><p class="text-5xl font-black text-blue-600">' + nilai + '</p></div>';
-            htmlContent += '</div>';
+            // Sort by Nomor Undi
+            listSesi.sort((a,b) => String(a[0]).localeCompare(String(b[0]), undefined, {numeric: true}));
+
+            let countSelesai = 0;
+            let countSisa = 0;
+
+            listSesi.forEach(b => {
+                let noId = b[0];
+                let namaBarung = b[1];
+                let sekolah = b[2];
+
+                // Pencarian
+                if(keyword && !String(noId).toLowerCase().includes(keyword) && !namaBarung.toLowerCase().includes(keyword)) return;
+
+                // Cek apakah barung ini ada di data server (Sudah Dinilai)
+                let scoreRecord = serverScores.find(r => r[2] === namaBarung);
+                let isScored = scoreRecord ? true : false;
+                let currentScore = isScored ? scoreRecord[4] : null;
+
+                if(isScored) countSelesai++; else countSisa++;
+
+                // Desain Baris
+                let bgClass = isScored ? "bg-green-50" : "bg-white hover:bg-slate-50";
+                let textClass = isScored ? "text-green-700" : "text-slate-700";
+                let actionBtn = isScored 
+                    ? `<button onclick="bukaInputNilai('${noId}', '${namaBarung}', '${sekolah}', true, ${currentScore})" class="px-3 py-1.5 bg-green-600 text-white text-xs font-bold rounded-lg btn-click shadow-sm flex items-center gap-1"><i data-lucide="edit-2" class="w-3 h-3"></i> Edit (Nilai: ${currentScore})</button>`
+                    : `<button onclick="bukaInputNilai('${noId}', '${namaBarung}', '${sekolah}', false, 0)" class="px-4 py-2 bg-blue-600 text-white text-xs font-bold rounded-lg btn-click shadow-md">NILAI SEKARANG</button>`;
+
+                let html = `
+                    <div class="p-4 ${bgClass} flex justify-between items-center transition-colors">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl flex items-center justify-center font-black text-lg ${isScored ? 'bg-green-200 text-green-700' : 'bg-slate-200 text-slate-600'}">
+                                ${noId}
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-base ${textClass}">${namaBarung}</h4>
+                                <p class="text-[10px] ${isScored ? 'text-green-600 font-bold' : 'text-slate-400'} uppercase">${isScored ? 'Selesai Dinilai' : 'Belum Dinilai'}</p>
+                            </div>
+                        </div>
+                        <div>${actionBtn}</div>
+                    </div>
+                `;
+                container.innerHTML += html;
+            });
+            
+            document.getElementById('counterSelesai').innerHTML = `<i data-lucide="check-circle" class="w-3 h-3 inline"></i> ${countSelesai} Selesai`;
+            document.getElementById('counterSisa').innerHTML = `<i data-lucide="clock" class="w-3 h-3 inline"></i> ${countSisa} Antri`;
+            lucide.createIcons();
+        }
+
+        function filterDaftarBarung() { renderDaftarBarung(); }
+
+        // 6. POPUP INPUT NILAI (REPLACEMENT DROP-DOWN)
+        function bukaInputNilai(idBarung, namaBarung, sekolah, isEdit, oldScore) {
+            let titleText = isEdit ? `REVISI NILAI: ${idBarung} - ${namaBarung}` : `INPUT NILAI: ${idBarung} - ${namaBarung}`;
+            let btnText = isEdit ? `SIMPAN REVISI` : `KIRIM NILAI`;
+            let btnColor = isEdit ? '#f59e0b' : '#16a34a';
 
             Swal.fire({
-                title: 'Konfirmasi', html: htmlContent,
-                showCancelButton: true, confirmButtonColor: '#16a34a', cancelButtonColor: '#ef4444',
-                confirmButtonText: 'YA, KIRIM', cancelButtonText: 'Batal'
+                title: titleText,
+                html: `
+                    <p class="text-xs text-slate-500 mb-4">Masukkan rentang nilai 0 - 100</p>
+                    <input type="number" id="swalInputNilai" class="swal2-input text-center text-5xl font-black text-blue-600 !mt-0" value="${isEdit ? oldScore : ''}" placeholder="0">
+                `,
+                showCancelButton: true,
+                confirmButtonText: btnText,
+                cancelButtonText: 'Batal',
+                confirmButtonColor: btnColor,
+                preConfirm: () => {
+                    const nilai = document.getElementById('swalInputNilai').value;
+                    if (!nilai) { Swal.showValidationMessage('Nilai wajib diisi!'); return false; }
+                    return nilai;
+                }
             }).then((result) => {
-                if (result.isConfirmed) { simpanKeAntrian(barungData, nilai); }
+                if (result.isConfirmed) {
+                    kirimDataServer(idBarung, namaBarung, sekolah, result.value, isEdit);
+                }
             });
         }
 
-        function simpanKeAntrian(barungData, nilai) {
-            let timestamp = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
-            
+        // 7. PROSES KIRIM DATA
+        function kirimDataServer(idBarung, namaBarung, sekolah, nilai, isEdit) {
             let paket = {
                 uid: Date.now(),
                 idTaman: session.id,
                 namaTaman: session.nama,
-                idBarung: barungData.id,
-                namaBarung: barungData.nama,
-                pangkalan: barungData.sekolah,
+                idBarung: idBarung,
+                namaBarung: namaBarung,
+                pangkalan: sekolah,
                 nilai: nilai,
-                timestamp: timestamp,
-                status: 'pending'
+                action: 'input' // Akan meng-update di backend jika kunci sudah ada
             };
 
-            queue.push(paket);
-            localStorage.setItem('scout_queue', JSON.stringify(queue));
+            // Masukkan antrian offline
+            offlineQueue.push(paket);
+            processOfflineQueue(); // Langsung coba kirim
 
-            sessionHistory.unshift(paket);
-            localStorage.setItem('scout_history', JSON.stringify(sessionHistory));
-
-            assessedIds.push(barungData.id);
-            localStorage.setItem('scout_assessed', JSON.stringify(assessedIds));
-
-            document.getElementById('inputBarung').value = "";
-            document.getElementById('inputNilai').value = "";
-            document.getElementById('inputBarung').focus(); 
-
-            loadBarungBySession();
-            renderHistoryFromStorage();
-            updateQueueUI();
-            processQueue();
-
-            const Toast = Swal.mixin({toast: true, position: 'top-end', showConfirmButton: false, timer: 3000, timerProgressBar: true});
-            Toast.fire({ icon: 'success', title: 'Tersimpan' });
+            // Tampilkan info langsung
+            document.getElementById('searchBox').value = ''; // Reset pencarian
+            
+            // Visual feedback local
+            Swal.fire({
+                toast: true, position: 'top', icon: 'success', 
+                title: isEdit ? 'Revisi diproses...' : 'Nilai diproses...', 
+                showConfirmButton: false, timer: 2000
+            });
+            
+            // Langsung panggil sync agar UI cepat update (pura-pura cepat)
+            setTimeout(syncServerData, 1000);
         }
 
-        async function processQueue() {
-            if (queue.length === 0) return;
-            
-            let statusDot = document.getElementById('statusDot');
-            statusDot.className = "w-3 h-3 bg-yellow-400 rounded-full animate-ping";
-            
-            let item = queue[0];
-
+        async function processOfflineQueue() {
+            if (offlineQueue.length === 0) return;
+            let item = offlineQueue[0];
             try {
                 await fetch(API_URL, {
                     method: 'POST', mode: 'no-cors', headers: { "Content-Type": "text/plain" }, body: JSON.stringify(item)
                 });
-                
-                queue.shift();
-                localStorage.setItem('scout_queue', JSON.stringify(queue));
-                
-                let histIndex = sessionHistory.findIndex(x => x.uid === item.uid);
-                if(histIndex !== -1) {
-                    sessionHistory[histIndex].status = 'sent';
-                    localStorage.setItem('scout_history', JSON.stringify(sessionHistory));
-                    renderHistoryFromStorage();
-                }
-
-                updateQueueUI();
-                statusDot.className = "w-3 h-3 bg-green-500 rounded-full shadow";
-
+                offlineQueue.shift(); // Hapus kalau sukses
+                syncServerData(); // Update data real dari server
             } catch (err) {
-                statusDot.className = "w-3 h-3 bg-red-500 rounded-full shadow";
+                console.log("Antri di background...");
             }
         }
 
-        // UI HELPERS
-        function updateQueueUI() {
-            let count = queue.length;
-            let badge = document.getElementById('queueBadge');
-            document.getElementById('queueCount').innerText = count;
-            count > 0 ? badge.classList.remove('hidden') : badge.classList.add('hidden');
+        // 8. REKAP JURI
+        function tampilkanRekap() {
+            document.getElementById('modalRekap').classList.remove('hidden');
+            let tbody = document.getElementById('tableRekapBody');
+            tbody.innerHTML = "";
+            
+            if(serverScores.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="3" class="text-center p-4 text-slate-500">Belum ada nilai terinput.</td></tr>`;
+                return;
+            }
+
+            // Urutkan rekap berdasarkan waktu input terbaru
+            let sortedScores = [...serverScores].sort((a,b) => new Date(b[0]) - new Date(a[0]));
+
+            sortedScores.forEach((row, i) => {
+                // Cari Nomor Undi
+                let bInfo = dbBarung.find(b => b[1] === row[2]);
+                let noUndi = bInfo ? bInfo[0] : "-";
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td class="p-3 text-center font-bold text-slate-400 border-r border-slate-100">${noUndi}</td>
+                        <td class="p-3 font-bold text-slate-700">${row[2]}<br><span class="text-[10px] text-slate-400 font-normal">Terkirim</span></td>
+                        <td class="p-3 text-center font-black text-blue-600 text-lg border-l border-slate-100">${row[4]}</td>
+                    </tr>
+                `;
+            });
         }
 
-        function renderHistoryFromStorage() {
-             let list = document.getElementById('historyList');
-             list.innerHTML = "";
-             
-             sessionHistory.forEach(item => {
-                let statusBadge = item.status === 'pending' 
-                    ? '<span class="text-orange-400 flex items-center gap-1">Antri...</span>' 
-                    : '<span class="text-green-600 flex items-center gap-1 font-bold">Terkirim <i data-lucide="check-circle" class="w-4 h-4"></i></span>';
-                
-                let div = document.createElement('div');
-                div.className = "bg-white p-4 rounded-xl border border-gray-100 flex justify-between items-center text-sm shadow-sm mb-2";
-                
-                let html = '<div class="flex items-center gap-3">';
-                html += '<div class="bg-gray-100 w-10 h-10 rounded-lg flex items-center justify-center font-bold text-gray-600 text-xs border border-gray-200">' + item.idBarung + '</div>';
-                html += '<div><div class="font-bold text-gray-700 text-sm">' + item.namaBarung + '</div>';
-                html += '<div class="text-[10px] text-gray-400 flex items-center gap-1"><i data-lucide="clock" class="w-3 h-3"></i> ' + item.timestamp + '</div></div></div>';
-                html += '<div class="text-right"><div class="font-black text-blue-600 text-xl">' + item.nilai + '</div>';
-                html += '<div class="text-[10px] text-gray-400 flex justify-end mt-1">' + statusBadge + '</div></div>';
-                
-                div.innerHTML = html;
-                list.appendChild(div);
-             });
-             
-             document.getElementById('histCount').innerText = sessionHistory.length;
-             lucide.createIcons();
-        }
+        function tutupRekap() { document.getElementById('modalRekap').classList.add('hidden'); }
 
+        // 9. LOGOUT
         function doLogout() {
             Swal.fire({
-                title: 'Keluar?', text: "Riwayat sesi ini akan dihapus.", icon: 'warning',
-                showCancelButton: true, confirmButtonColor: '#ef4444', cancelButtonColor: '#334155', confirmButtonText: 'Ya, Logout'
+                title: 'Akhiri Tugas?',
+                text: "Anda harus login ulang untuk menilai.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                confirmButtonText: 'Ya, Keluar'
             }).then((result) => {
                 if (result.isConfirmed) {
                     localStorage.removeItem('scout_session');
-                    localStorage.removeItem('scout_assessed');
-                    localStorage.removeItem('scout_history'); 
                     location.reload();
                 }
             });
