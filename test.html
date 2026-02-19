@@ -2,9 +2,9 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Kwarran - ScoutLive</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚜️</text></svg>">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Juri - ScoutLive</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⛺</text></svg>">
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -12,411 +12,418 @@
     
     <style>
         body { -webkit-tap-highlight-color: transparent; }
-        .swal2-popup { font-family: sans-serif; border-radius: 1rem; }
-        .hidden { display: none !important; }
+        .btn-active:active { transform: scale(0.95); transition: 0.1s; }
+        select { font-family: sans-serif; }
         
-        /* CSS CETAK */
-        @media print {
-            .no-print, nav, #loginOverlay, .tab-menu, .swal2-container { display: none !important; }
-            #printArea { display: block !important; position: absolute; top: 0; left: 0; width: 100%; background: white; color: black; }
-            body { background: white; padding: 0; margin: 0; }
-            table { width: 100%; border-collapse: collapse; border: 1px solid black; }
-            th, td { border: 1px solid black; padding: 4px; text-align: left; font-size: 11px; } 
-            th { background-color: #f0f0f0 !important; -webkit-print-color-adjust: exact; text-align: center; font-weight: bold; }
-            @page { size: landscape; margin: 10mm; }
-        }
-        #printArea { display: none; }
+        /* SweetAlert Style */
+        .swal2-popup { border-radius: 1rem !important; padding: 1.5rem !important; }
+        .swal2-title { font-size: 1.25rem !important; color: #1e293b !important; }
+        .swal2-confirm, .swal2-cancel { border-radius: 0.5rem !important; font-weight: bold !important; }
     </style>
 </head>
-<body class="bg-slate-50 font-sans text-slate-800">
+<body class="bg-gray-100 font-sans text-gray-800">
 
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbyfB19FroqDqmvn7JfSjxNQ03NzPB6_dgajXxGms_bwD51-Crhet615fcWG3xJVC4Uv/exec"; 
     </script>
 
-    <div id="loginOverlay" class="fixed inset-0 bg-slate-900 z-50 flex items-center justify-center p-4">
-        <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-sm text-center border-t-4 border-red-600">
-            <div class="mx-auto bg-red-100 w-16 h-16 rounded-full flex items-center justify-center mb-4">
-                <i data-lucide="shield" class="w-8 h-8 text-red-600"></i>
+    <div class="fixed top-0 left-0 right-0 bg-slate-900 text-white z-50 shadow-md">
+        <div class="max-w-md mx-auto px-4 h-14 flex justify-between items-center">
+            <div class="flex items-center gap-2 font-bold text-lg">
+                <i data-lucide="tent" class="w-5 h-5 text-yellow-400"></i> Juri<span class="text-yellow-400">App</span>
             </div>
-            <h2 class="text-xl font-bold mb-1">Admin Kwarran</h2>
-            <p class="text-sm text-slate-500 mb-6">Panel Kontrol Data Lomba</p>
-            <input type="password" id="adminPass" class="w-full p-3 border rounded-lg mb-4 text-center font-bold tracking-widest outline-none focus:ring-2 focus:ring-red-500" placeholder="PASSWORD">
-            <button id="btnLoginBtn" class="w-full bg-red-700 hover:bg-red-800 text-white py-3 rounded-lg font-bold transition">MASUK</button>
+            <div class="flex items-center gap-3 text-xs">
+                <div id="queueBadge" class="hidden bg-orange-500 px-2 py-1 rounded-full font-bold shadow-sm">
+                    Antri: <span id="queueCount">0</span>
+                </div>
+                <div id="statusDot" class="w-3 h-3 bg-gray-400 rounded-full border-2 border-white shadow"></div>
+            </div>
         </div>
     </div>
 
-    <nav class="bg-white shadow-sm border-b sticky top-0 z-40 no-print">
-        <div class="max-w-6xl mx-auto px-4 h-16 flex justify-between items-center">
-            <div class="font-bold text-lg flex items-center gap-2 text-slate-800">
-                <i data-lucide="shield" class="w-6 h-6 text-red-600"></i> Admin<span class="text-red-600">Kwarran</span>
-            </div>
-            <div class="flex gap-2">
-                <button id="btnRefresh" class="p-2 bg-slate-100 rounded-lg hover:bg-slate-200" title="Refresh"><i data-lucide="refresh-cw" class="w-5 h-5 text-slate-600"></i></button>
-                <button id="btnLogout" class="p-2 bg-red-50 rounded-lg hover:bg-red-100 text-red-600" title="Keluar"><i data-lucide="log-out" class="w-5 h-5"></i></button>
-            </div>
-        </div>
-    </nav>
+    <div class="max-w-md mx-auto pt-20 pb-10 px-4 min-h-screen">
 
-    <main class="max-w-6xl mx-auto p-4 pb-20 space-y-6 no-print">
-        <div class="flex p-1 bg-slate-200 rounded-xl tab-menu max-w-md mx-auto">
-            <button onclick="switchTab('monitor')" id="btn-monitor" class="flex-1 py-2 px-4 rounded-lg font-bold text-sm bg-white shadow-sm text-red-600 transition">📡 Monitor Live</button>
-            <button onclick="switchTab('laporan')" id="btn-laporan" class="flex-1 py-2 px-4 rounded-lg font-bold text-sm text-slate-500 hover:text-slate-700 transition">🖨️ Laporan & Excel</button>
-        </div>
-
-        <div id="tab-monitor" class="space-y-6 animate-fade-in">
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
-                    <div class="text-xs font-bold text-slate-400 uppercase mb-1">Total Input</div>
-                    <h3 class="text-2xl font-bold text-slate-800" id="totalData">0</h3>
-                </div>
-                <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
-                    <div class="text-xs font-bold text-slate-400 uppercase mb-1">Pos Aktif</div>
-                    <h3 class="text-2xl font-bold text-green-600" id="activeTaman">0</h3>
-                </div>
-                <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 col-span-2">
-                    <div class="text-xs font-bold text-slate-400 uppercase mb-1">Status Sistem</div>
-                    <div class="flex items-center gap-2">
-                        <span class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></span>
-                        <span class="text-sm font-medium text-slate-600">Online • <span id="lastUpdate">-</span></span>
+        <div id="pageLogin" class="hidden">
+            <div class="bg-white p-6 rounded-2xl shadow-xl border border-gray-100">
+                <div class="text-center mb-6">
+                    <div class="bg-slate-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <i data-lucide="shield-check" class="w-8 h-8 text-slate-600"></i>
                     </div>
+                    <h2 class="text-xl font-bold text-slate-800">Login Petugas</h2>
+                    <p class="text-xs text-gray-400">Atur sesi penilaian Anda</p>
                 </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-                    <div class="bg-slate-800 text-white p-3 flex justify-between items-center">
-                        <h3 class="font-bold flex items-center gap-2"><i data-lucide="user"></i> PUTRA</h3>
-                        <span class="text-xs bg-slate-700 px-2 py-1 rounded">Top 5 Live</span>
-                    </div>
-                    <div class="overflow-x-auto"><table class="w-full text-sm text-left"><tbody id="livePutra" class="divide-y divide-slate-100"></tbody></table></div>
-                </div>
-                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-                    <div class="bg-red-700 text-white p-3 flex justify-between items-center">
-                        <h3 class="font-bold flex items-center gap-2"><i data-lucide="user-check"></i> PUTRI</h3>
-                        <span class="text-xs bg-red-800 px-2 py-1 rounded">Top 5 Live</span>
-                    </div>
-                    <div class="overflow-x-auto"><table class="w-full text-sm text-left"><tbody id="livePutri" class="divide-y divide-slate-100"></tbody></table></div>
-                </div>
-            </div>
-
-            <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-                <div class="p-4 border-b bg-slate-50 flex justify-between items-center">
-                    <h3 class="font-bold flex items-center gap-2"><i data-lucide="list"></i> Log Input Terakhir</h3>
-                </div>
-                <div id="logList" class="divide-y divide-slate-100 max-h-[400px] overflow-y-auto"></div>
-            </div>
-            
-            <div class="mt-8 pt-6 border-t border-slate-300 text-center">
-                <button onclick="resetAllData()" class="text-red-500 text-xs font-bold hover:text-red-700 flex items-center justify-center gap-1 mx-auto bg-red-50 px-4 py-2 rounded-full border border-red-100"><i data-lucide="trash-2" class="w-3 h-3"></i> RESET DATA LOMBA</button>
-            </div>
-        </div>
-
-        <div id="tab-laporan" class="space-y-6 hidden animate-fade-in">
-            <div class="bg-white p-5 rounded-xl shadow-sm border border-purple-200 bg-purple-50">
-                <div class="flex items-center gap-3 mb-4">
-                    <div class="bg-purple-200 p-2 rounded-lg"><i data-lucide="table" class="w-6 h-6 text-purple-700"></i></div>
+                
+                <div class="space-y-5">
                     <div>
-                        <h3 class="font-bold text-lg text-purple-900">Matriks Rekapitulasi</h3>
-                        <p class="text-xs text-purple-600">Download Excel / Cetak</p>
+                        <label class="block text-xs font-bold uppercase text-gray-400 mb-2">Kategori (Wajib)</label>
+                        <div class="grid grid-cols-2 gap-3">
+                            <button onclick="selectCategory('Putra')" id="btnLoginPa" class="p-4 rounded-xl border-2 border-slate-100 flex flex-col items-center justify-center gap-2 hover:bg-blue-50 transition-all opacity-60">
+                                <div class="bg-blue-100 p-2 rounded-full text-blue-600"><i data-lucide="user" class="w-6 h-6"></i></div>
+                                <span class="font-bold text-slate-600">PUTRA</span>
+                            </button>
+                            <button onclick="selectCategory('Putri')" id="btnLoginPi" class="p-4 rounded-xl border-2 border-slate-100 flex flex-col items-center justify-center gap-2 hover:bg-red-50 transition-all opacity-60">
+                                <div class="bg-red-100 p-2 rounded-full text-red-600"><i data-lucide="user-check" class="w-6 h-6"></i></div>
+                                <span class="font-bold text-slate-600">PUTRI</span>
+                            </button>
+                        </div>
+                        <input type="hidden" id="selectedCategory" value="">
                     </div>
-                </div>
-                <div class="space-y-2">
-                    <div class="flex gap-2 items-center">
-                        <span class="text-xs font-bold w-12 text-slate-500">PUTRA:</span>
-                        <button onclick="processRekap('Putra', 'print')" class="flex-1 bg-purple-700 text-white py-2 rounded-lg font-bold hover:bg-purple-800 flex items-center justify-center gap-2 text-xs"><i data-lucide="printer" class="w-3 h-3"></i> PDF</button>
-                        <button onclick="processRekap('Putra', 'excel')" class="flex-1 bg-green-600 text-white py-2 rounded-lg font-bold hover:bg-green-700 flex items-center justify-center gap-2 text-xs"><i data-lucide="file-spreadsheet" class="w-3 h-3"></i> Excel</button>
-                    </div>
-                    <div class="flex gap-2 items-center">
-                        <span class="text-xs font-bold w-12 text-slate-500">PUTRI:</span>
-                        <button onclick="processRekap('Putri', 'print')" class="flex-1 bg-purple-700 text-white py-2 rounded-lg font-bold hover:bg-purple-800 flex items-center justify-center gap-2 text-xs"><i data-lucide="printer" class="w-3 h-3"></i> PDF</button>
-                        <button onclick="processRekap('Putri', 'excel')" class="flex-1 bg-green-600 text-white py-2 rounded-lg font-bold hover:bg-green-700 flex items-center justify-center gap-2 text-xs"><i data-lucide="file-spreadsheet" class="w-3 h-3"></i> Excel</button>
-                    </div>
-                </div>
-            </div>
 
-            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
-                <div class="flex items-center gap-3 mb-4">
-                    <div class="bg-yellow-100 p-2 rounded-lg"><i data-lucide="trophy" class="w-6 h-6 text-yellow-600"></i></div>
-                    <div><h3 class="font-bold text-lg">Cetak Juara</h3></div>
-                </div>
-                <div class="grid grid-cols-2 gap-3">
-                    <button onclick="printKlasemen('Putra')" class="bg-slate-800 text-white py-2 rounded-lg font-bold hover:bg-slate-700 gap-2 flex justify-center items-center text-sm"><i data-lucide="printer" class="w-4 h-4"></i> JUARA PUTRA</button>
-                    <button onclick="printKlasemen('Putri')" class="bg-red-700 text-white py-2 rounded-lg font-bold hover:bg-red-800 gap-2 flex justify-center items-center text-sm"><i data-lucide="printer" class="w-4 h-4"></i> JUARA PUTRI</button>
-                </div>
-            </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Pilih Pos / Taman</label>
+                        <div class="relative">
+                            <select id="loginTaman" class="w-full p-4 bg-gray-50 border-2 border-gray-200 rounded-xl outline-none focus:border-slate-800 font-bold text-slate-700">
+                                <option value="">Memuat data...</option>
+                            </select>
+                            <i data-lucide="chevron-down" class="absolute right-4 top-4 w-5 h-5 text-gray-400 pointer-events-none"></i>
+                        </div>
+                    </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
-                    <div class="flex items-center gap-2 mb-2"><i data-lucide="tent" class="w-5 h-5 text-blue-600"></i><h3 class="font-bold text-sm uppercase">Rekap Per Taman</h3></div>
-                    <div class="flex gap-2">
-                        <select id="selectTamanPrint" class="flex-1 p-2 border rounded bg-slate-50 text-xs font-bold"><option value="">Pilih Taman...</option></select>
-                        <button onclick="printRekapTaman()" class="bg-blue-600 text-white px-3 rounded hover:bg-blue-700"><i data-lucide="printer" class="w-4 h-4"></i></button>
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Kode Akses</label>
+                        <input type="text" id="loginPass" placeholder="******" class="w-full p-4 bg-gray-50 border-2 border-gray-200 rounded-xl outline-none focus:border-slate-800 font-bold text-center tracking-widest text-lg">
                     </div>
-                </div>
-                <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
-                    <div class="flex items-center gap-2 mb-2"><i data-lucide="users" class="w-5 h-5 text-green-600"></i><h3 class="font-bold text-sm uppercase">Rapor Barung</h3></div>
-                    <div class="flex gap-2">
-                        <select id="selectBarungPrint" class="flex-1 p-2 border rounded bg-slate-50 text-xs font-bold"><option value="">Pilih Barung...</option></select>
-                        <button onclick="printRaporBarung()" class="bg-green-600 text-white px-3 rounded hover:bg-green-700"><i data-lucide="printer" class="w-4 h-4"></i></button>
-                    </div>
+
+                    <button onclick="doLogin()" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-4 rounded-xl btn-active shadow-lg text-lg flex justify-center items-center gap-2">
+                        <span>MASUK POS</span> <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                    </button>
                 </div>
             </div>
         </div>
-    </main>
 
-    <div id="printArea">
-        <div class="kop-surat">
-            <h1 style="font-size: 20px; font-weight: bold; margin: 0;">GERAKAN PRAMUKA</h1>
-            <h1 style="font-size: 20px; font-weight: bold; margin: 0;">KWARTIR RANTING SELOGIRI</h1>
-            <h2 style="font-size: 14px; margin: 5px 0; font-weight: normal;">LAPORAN HASIL PESTA SIAGA TAHUN 2026</h2>
+        <div id="pageInput" class="hidden">
+            <div class="flex justify-between items-center mb-4 px-1">
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span id="badgeKategori" class="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-slate-200 text-slate-600">-</span>
+                        <p class="text-[10px] text-gray-400 uppercase font-bold tracking-wider">Pos Penilaian:</p>
+                    </div>
+                    <h2 id="userTamanName" class="text-lg font-bold text-slate-800 leading-tight">...</h2>
+                </div>
+                <button onclick="doLogout()" class="bg-white text-red-500 p-2.5 rounded-xl border border-red-100 shadow-sm hover:bg-red-50 active:scale-95 transition">
+                    <i data-lucide="log-out" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <div class="bg-white p-5 rounded-2xl shadow-xl border border-gray-100 mb-6 relative overflow-hidden">
+                <div class="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-blue-50 rounded-full blur-2xl opacity-50 pointer-events-none"></div>
+
+                <div class="bg-blue-50 p-3 rounded-lg mb-5 text-xs text-blue-800 flex items-start gap-2 border border-blue-100">
+                    <i data-lucide="info" class="w-4 h-4 mt-0.5 flex-shrink-0 text-blue-600"></i>
+                    <p>Cocokkan <b>NOMOR UNDI</b> di dada peserta.</p>
+                </div>
+
+                <div class="mb-5">
+                    <label class="block text-xs font-bold uppercase text-gray-400 mb-1 ml-1">Nomor & Warna Barung</label>
+                    <div class="relative">
+                        <select id="inputBarung" class="w-full p-4 pl-5 text-xl font-black border-2 border-gray-200 rounded-xl bg-white outline-none focus:border-blue-500 text-slate-800 tracking-wide shadow-sm">
+                            <option value="">-- Pilih Peserta --</option>
+                        </select>
+                        <div class="absolute right-4 top-4 bg-gray-100 p-1 rounded-md pointer-events-none">
+                            <i data-lucide="chevron-down" class="w-5 h-5 text-gray-500"></i>
+                        </div>
+                    </div>
+                    <p id="barungCount" class="text-xs text-right text-blue-600 mt-1.5 font-medium italic pr-1">Memuat...</p>
+                </div>
+
+                <div class="mb-6">
+                    <label class="block text-xs font-bold uppercase text-gray-400 mb-1 ml-1">Nilai (0-100)</label>
+                    <input type="number" id="inputNilai" inputmode="numeric" placeholder="0" class="w-full p-4 text-center text-5xl font-black text-blue-600 border-2 border-gray-200 rounded-xl outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-50 placeholder-gray-200 shadow-inner bg-gray-50 focus:bg-white">
+                </div>
+
+                <button onclick="konfirmasiKirim()" class="w-full bg-green-600 hover:bg-green-700 text-white text-lg font-bold py-4 rounded-xl shadow-lg shadow-green-200 btn-active flex justify-center items-center gap-2">
+                    <i data-lucide="send" class="w-5 h-5"></i> KIRIM NILAI
+                </button>
+            </div>
+
+            <div>
+                <div class="flex items-center justify-between px-1 mb-3">
+                    <h3 class="text-xs font-bold text-gray-400 uppercase">Sudah Dinilai (Sesi Ini)</h3>
+                    <span class="text-[10px] bg-gray-200 px-2 py-0.5 rounded text-gray-500" id="histCount">0</span>
+                </div>
+                <div id="historyList" class="space-y-2 pb-20"></div>
+            </div>
         </div>
-        <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
-            <div style="font-size: 12px;">Hal: <span id="printCategory" style="font-weight: bold;">-</span></div>
-            <div style="font-size: 12px;">Waktu Cetak: <span id="printDate"></span></div>
-        </div>
-        <h3 id="printTitle" style="text-align: center; margin-bottom: 15px; text-transform: uppercase; font-weight: bold; font-size: 16px; text-decoration: underline;">JUDUL LAPORAN</h3>
-        <div id="printContent"></div>
-        <div style="margin-top: 30px; display: flex; justify-content: space-between; page-break-inside: avoid;">
-            <div style="text-align: center; width: 30%; font-size: 12px;"><br>Mengetahui,<br>Ketua Panitia<br><br><br><br><br>____________________</div>
-            <div style="text-align: center; width: 30%; font-size: 12px;">Selogiri, <span id="printDateSign"></span><br>Petugas Admin<br><br><br><br><br>____________________</div>
-        </div>
+
     </div>
 
     <script>
-        // INISIALISASI
         lucide.createIcons();
-        let PASSWORD = "";
-        let rawData = []; let masterTaman = []; let masterBarung = [];
 
-        // EVENT LISTENER (Agar lebih aman dari error HTML)
-        document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('btnLoginBtn').addEventListener('click', checkLogin);
-            document.getElementById('btnRefresh').addEventListener('click', loadAllData);
-            document.getElementById('btnLogout').addEventListener('click', logout);
-        });
+        // STATE
+        let dbTaman = []; 
+        let dbBarung = []; 
+        let session = JSON.parse(localStorage.getItem('scout_session'));
+        let queue = JSON.parse(localStorage.getItem('scout_queue')) || [];
+        let assessedIds = JSON.parse(localStorage.getItem('scout_assessed')) || [];
+        let sessionHistory = JSON.parse(localStorage.getItem('scout_history')) || [];
 
-        // --- AUTH ---
-        function checkLogin() {
-            const pass = document.getElementById('adminPass').value;
-            if(!pass) { Swal.fire('Error', 'Masukkan Password', 'error'); return; }
-            PASSWORD = pass;
-            document.getElementById('loginOverlay').classList.add('hidden');
-            loadAllData();
-            setInterval(loadAllData, 30000);
-            Swal.fire({icon:'success', title:'Masuk Berhasil', timer:1000, showConfirmButton:false});
-        }
-        function logout() { location.reload(); }
+        // INIT
+        window.onload = function() {
+            updateQueueUI();
+            if (session) {
+                tampilkanHalamanInput();
+            } else {
+                document.getElementById('pageLogin').classList.remove('hidden');
+                fetchMasterData(); 
+            }
+            setInterval(processQueue, 2000);
+        };
 
-        function getSafeGender(namaBarung) {
-            let info = masterBarung.find(b => b[1] == namaBarung);
-            return (info && info[3]) ? String(info[3]) : "?"; 
-        }
-
-        // --- DATA ---
-        async function loadAllData() {
-            document.getElementById('lastUpdate').innerText = "Loading...";
+        // DATA
+        async function fetchMasterData() {
             try {
-                // Master
-                const r1 = await fetch(API_URL + "?action=getData");
-                const j1 = await r1.json();
-                if(j1.status === "success") {
-                     masterTaman = j1.data.taman;
-                     masterBarung = j1.data.barung;
-                     renderDropdownPrint();
+                let res = await fetch(API_URL + "?action=getData");
+                let json = await res.json();
+                if (json.status == "success") {
+                    dbTaman = json.data.taman;
+                    dbBarung = json.data.barung;
+                    localStorage.setItem('db_taman', JSON.stringify(dbTaman));
+                    localStorage.setItem('db_barung', JSON.stringify(dbBarung));
+                    renderLoginDropdown();
+                    document.getElementById('statusDot').className = "w-3 h-3 bg-green-500 rounded-full border-2 border-white shadow";
                 }
-                // Nilai
-                const r2 = await fetch(API_URL + "?action=getAdminData");
-                const j2 = await r2.json();
-                if(j2.status === "success") {
-                    rawData = j2.data; 
-                    renderStatsAndLog(rawData);
-                }
-                // Klasemen
-                const r3 = await fetch(API_URL + "?action=getKlasemen");
-                const j3 = await r3.json();
-                if(j3.status === "success") renderLiveKlasemen(j3.data);
-                
-                document.getElementById('lastUpdate').innerText = new Date().toLocaleTimeString();
-            } catch(e) { console.error(e); }
+            } catch (e) {
+                console.log("Offline");
+                dbTaman = JSON.parse(localStorage.getItem('db_taman')) || [];
+                dbBarung = JSON.parse(localStorage.getItem('db_barung')) || [];
+                renderLoginDropdown();
+            }
         }
 
-        // --- RENDER ---
-        function renderStatsAndLog(data) {
-            document.getElementById('totalData').innerText = data.length;
-            let tamanSet = new Set(data.map(r => r[1]));
-            document.getElementById('activeTaman').innerText = tamanSet.size;
-            
-            const list = document.getElementById('logList');
-            list.innerHTML = "";
-            let view = data.slice().reverse().slice(0, 30);
-            view.forEach(row => {
-                let g = getSafeGender(row[2]);
-                let bg = g.toLowerCase().includes('putra') ? 'bg-slate-200' : 'bg-red-100';
-                list.innerHTML += `<div class="p-3 flex justify-between hover:bg-slate-50 border-b">
-                    <div class="flex gap-3 items-center">
-                        <span class="${bg} px-2 rounded text-xs font-bold">${g.includes('Putra') ? 'PA':'PI'}</span>
-                        <div><div class="font-bold text-sm">${row[2]}</div><div class="text-xs text-slate-500">${row[1]} • Score: ${row[4]}</div></div>
-                    </div>
-                    <button onclick="hapusData('${row[5]}')" class="text-slate-300 hover:text-red-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-                </div>`;
+        function renderLoginDropdown() {
+            let sel = document.getElementById('loginTaman');
+            sel.innerHTML = '<option value="">-- Pilih Pos Anda --</option>';
+            dbTaman.forEach(t => {
+                let opt = document.createElement('option');
+                opt.value = t[0]; opt.text = t[1]; sel.appendChild(opt);
             });
-            lucide.createIcons();
         }
 
-        function renderLiveKlasemen(data) {
-            let pa = [], pi = [];
-            data.forEach(r => {
-                let g = getSafeGender(r[0]).toLowerCase();
-                if(g.includes('putra')) pa.push(r); else if(g.includes('putri')) pi.push(r);
+        // LOGIN
+        function selectCategory(cat) {
+            document.getElementById('selectedCategory').value = cat;
+            const btnPa = document.getElementById('btnLoginPa');
+            const btnPi = document.getElementById('btnLoginPi');
+            
+            btnPa.className = "p-4 rounded-xl border-2 border-slate-100 flex flex-col items-center justify-center gap-2 hover:bg-blue-50 transition-all opacity-50";
+            btnPi.className = "p-4 rounded-xl border-2 border-slate-100 flex flex-col items-center justify-center gap-2 hover:bg-red-50 transition-all opacity-50";
+            
+            if(cat === 'Putra') {
+                btnPa.className = "p-4 rounded-xl border-2 border-blue-500 bg-blue-50 flex flex-col items-center justify-center gap-2 text-blue-700 shadow-md transform scale-105 opacity-100 ring-2 ring-blue-200";
+            } else {
+                btnPi.className = "p-4 rounded-xl border-2 border-red-500 bg-red-50 flex flex-col items-center justify-center gap-2 text-red-700 shadow-md transform scale-105 opacity-100 ring-2 ring-red-200";
+            }
+        }
+
+        function doLogin() {
+            let cat = document.getElementById('selectedCategory').value;
+            let id = document.getElementById('loginTaman').value;
+            let pass = document.getElementById('loginPass').value;
+            
+            if(!cat) return Swal.fire({icon:'warning', title:'Pilih Kategori', text:'Klik tombol Putra atau Putri', confirmButtonColor:'#334155'});
+            if(!id) return Swal.fire({icon:'warning', title:'Pilih Pos', text:'Pos belum dipilih', confirmButtonColor:'#334155'});
+            if(!pass) return Swal.fire({icon:'warning', title:'Password Kosong', text:'Masukkan kode akses', confirmButtonColor:'#334155'});
+
+            if(dbTaman.length === 0) dbTaman = JSON.parse(localStorage.getItem('db_taman')) || [];
+            let found = dbTaman.find(t => t[0] == id);
+            if (!found) return Swal.fire('Error', 'Data Pos belum siap.', 'error');
+
+            if (found[2] == pass) {
+                session = { id: found[0], nama: found[1], kategori: cat };
+                localStorage.setItem('scout_session', JSON.stringify(session));
+                Swal.fire({
+                    icon: 'success', title: 'Berhasil Masuk', text: 'Selamat Bertugas!',
+                    timer: 1000, showConfirmButton: false
+                }).then(() => tampilkanHalamanInput());
+            } else {
+                Swal.fire({icon:'error', title:'Gagal', text:'Password Salah!', confirmButtonColor:'#d33'});
+            }
+        }
+
+        // DASHBOARD
+        function tampilkanHalamanInput() {
+            document.getElementById('pageLogin').classList.add('hidden');
+            document.getElementById('pageInput').classList.remove('hidden');
+            document.getElementById('userTamanName').innerText = session.nama;
+            
+            let badge = document.getElementById('badgeKategori');
+            badge.innerText = session.kategori.toUpperCase();
+            if(session.kategori === 'Putra') {
+                badge.className = "px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-blue-100 text-blue-600 border border-blue-200 shadow-sm";
+            } else {
+                badge.className = "px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-red-100 text-red-600 border border-red-200 shadow-sm";
+            }
+            
+            renderHistoryFromStorage();
+            loadBarungBySession();
+        }
+
+        function loadBarungBySession() {
+            dbBarung = JSON.parse(localStorage.getItem('db_barung')) || [];
+            let sel = document.getElementById('inputBarung');
+            sel.innerHTML = '<option value="">-- Pilih Peserta --</option>';
+            
+            let filtered = dbBarung.filter(b => {
+                let g = b[3] ? String(b[3]).toLowerCase() : "";
+                return g.includes(session.kategori.toLowerCase());
             });
-            fillTable('livePutra', pa); fillTable('livePutri', pi);
-        }
 
-        function fillTable(id, data) {
-            let h = "";
-            data.slice(0, 5).forEach((r, i) => {
-                h += `<tr class="border-b"><td class="p-3 text-center font-bold text-xs">${i+1}</td><td class="p-3"><div class="font-bold text-sm">${r[0]}</div><div class="text-[10px] text-slate-400">${r[1]}</div></td><td class="p-3 text-right font-bold text-blue-600 text-sm">${r[2]}</td></tr>`;
+            let remaining = filtered.filter(b => !assessedIds.includes(b[0]));
+            remaining.sort((a,b) => String(a[0]).localeCompare(String(b[0]), undefined, {numeric: true, sensitivity: 'base'}));
+
+            remaining.forEach(b => {
+                let opt = document.createElement('option');
+                opt.value = JSON.stringify({id: b[0], nama: b[1], sekolah: b[2]});
+                opt.text = b[0] + ' - ' + b[1]; 
+                sel.appendChild(opt);
             });
-            document.getElementById(id).innerHTML = h || `<tr><td colspan="3" class="p-4 text-center text-xs">Belum ada data</td></tr>`;
+
+            document.getElementById('barungCount').innerText = remaining.length + " Regu Tersedia";
+            if(remaining.length === 0) document.getElementById('barungCount').innerText = "Semua Selesai! 🎉";
         }
 
-        function renderDropdownPrint() {
-            let t = document.getElementById('selectTamanPrint');
-            t.innerHTML = '<option value="">Pilih Taman...</option>';
-            masterTaman.forEach(x => t.innerHTML += `<option value="${x[1]}">${x[1]}</option>`);
+        // KIRIM
+        function konfirmasiKirim() {
+            let barungVal = document.getElementById('inputBarung').value;
+            let nilai = document.getElementById('inputNilai').value;
+
+            if (!barungVal || nilai === "") { 
+                return Swal.fire({icon:'warning', title:'Belum Lengkap', text:'Pilih Peserta & Isi Nilai', confirmButtonColor:'#334155'}); 
+            }
             
-            let b = document.getElementById('selectBarungPrint');
-            b.innerHTML = '<option value="">Pilih Barung...</option>';
-            masterBarung.sort((x,y) => x[1].localeCompare(y[1]));
-            masterBarung.forEach(x => b.innerHTML += `<option value="${x[1]}">${x[1]} (${x[3]||'?'})</option>`);
+            let barungData = JSON.parse(barungVal);
+            
+            let htmlContent = '<div class="text-left bg-gray-50 p-3 rounded border">';
+            htmlContent += '<p class="text-xs text-gray-500">NOMOR</p><p class="font-bold text-lg mb-2">' + barungData.id + '</p>';
+            htmlContent += '<p class="text-xs text-gray-500">BARUNG</p><p class="font-bold text-lg mb-2">' + barungData.nama + '</p>';
+            htmlContent += '<div class="text-center mt-4 border-t pt-2"><p class="text-xs text-gray-400">NILAI</p><p class="text-5xl font-black text-blue-600">' + nilai + '</p></div>';
+            htmlContent += '</div>';
+
+            Swal.fire({
+                title: 'Konfirmasi', html: htmlContent,
+                showCancelButton: true, confirmButtonColor: '#16a34a', cancelButtonColor: '#ef4444',
+                confirmButtonText: 'YA, KIRIM', cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) { simpanKeAntrian(barungData, nilai); }
+            });
         }
 
-        // --- CORE PROCESS REKAP ---
-        async function processRekap(gender, mode) {
-            const res = await Swal.fire({title:`Rekap ${gender}?`, icon:'question', showCancelButton:true});
-            if(!res.isConfirmed) return;
+        function simpanKeAntrian(barungData, nilai) {
+            let timestamp = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+            
+            let paket = {
+                uid: Date.now(),
+                idTaman: session.id,
+                namaTaman: session.nama,
+                idBarung: barungData.id,
+                namaBarung: barungData.nama,
+                pangkalan: barungData.sekolah,
+                nilai: nilai,
+                timestamp: timestamp,
+                status: 'pending'
+            };
 
-            let barungs = masterBarung.filter(b => (b[3]||"").toLowerCase().includes(gender.toLowerCase()));
-            if(!barungs.length) { Swal.fire('Kosong', 'Tidak ada data barung', 'warning'); return; }
+            queue.push(paket);
+            localStorage.setItem('scout_queue', JSON.stringify(queue));
+
+            sessionHistory.unshift(paket);
+            localStorage.setItem('scout_history', JSON.stringify(sessionHistory));
+
+            assessedIds.push(barungData.id);
+            localStorage.setItem('scout_assessed', JSON.stringify(assessedIds));
+
+            document.getElementById('inputBarung').value = "";
+            document.getElementById('inputNilai').value = "";
+            document.getElementById('inputBarung').focus(); 
+
+            loadBarungBySession();
+            renderHistoryFromStorage();
+            updateQueueUI();
+            processQueue();
+
+            const Toast = Swal.mixin({toast: true, position: 'top-end', showConfirmButton: false, timer: 3000, timerProgressBar: true});
+            Toast.fire({ icon: 'success', title: 'Tersimpan' });
+        }
+
+        async function processQueue() {
+            if (queue.length === 0) return;
             
-            let tamans = masterTaman.map(t => t[1]).sort();
+            let statusDot = document.getElementById('statusDot');
+            statusDot.className = "w-3 h-3 bg-yellow-400 rounded-full animate-ping";
             
-            // Build Data
-            let finalData = barungs.map(b => {
-                let scores = {};
-                tamans.forEach(t => scores[t] = 0);
-                let total = 0;
-                
-                // Cari nilai barung ini di rawData
-                rawData.forEach(r => {
-                    if(r[2] === b[1]) { // Nama Barung Match
-                        scores[r[1]] = parseInt(r[4]); // r[1]=Taman, r[4]=Nilai
-                    }
+            let item = queue[0];
+
+            try {
+                await fetch(API_URL, {
+                    method: 'POST', mode: 'no-cors', headers: { "Content-Type": "text/plain" }, body: JSON.stringify(item)
                 });
                 
-                // Hitung total manual dari scores yang terkumpul
-                total = Object.values(scores).reduce((a,c) => a+c, 0);
+                queue.shift();
+                localStorage.setItem('scout_queue', JSON.stringify(queue));
                 
-                return { nama: b[1], pangkalan: b[2], scores: scores, total: total };
-            });
+                let histIndex = sessionHistory.findIndex(x => x.uid === item.uid);
+                if(histIndex !== -1) {
+                    sessionHistory[histIndex].status = 'sent';
+                    localStorage.setItem('scout_history', JSON.stringify(sessionHistory));
+                    renderHistoryFromStorage();
+                }
 
-            // Sort Ranking
-            finalData.sort((a,b) => b.total - a.total);
+                updateQueueUI();
+                statusDot.className = "w-3 h-3 bg-green-500 rounded-full shadow";
 
-            // Generate HTML
-            let h = `<table border="1" style="border-collapse:collapse;width:100%;font-family:Arial;font-size:12px;">
-                <thead style="background:#ddd;"><tr><th>RANK</th><th>NO</th><th>BARUNG</th><th>PANGKALAN</th>`;
-            tamans.forEach(t => h += `<th>${t}</th>`);
-            h += `<th>TOTAL</th></tr></thead><tbody>`;
-            
-            finalData.forEach((row, i) => {
-                h += `<tr><td style="text-align:center;">${i+1}</td><td style="text-align:center;">${i+1}</td><td>${row.nama}</td><td>${row.pangkalan}</td>`;
-                tamans.forEach(t => h += `<td style="text-align:center;">${row.scores[t]||'-'}</td>`);
-                h += `<td style="text-align:center;font-weight:bold;">${row.total}</td></tr>`;
-            });
-            h += `</tbody></table>`;
-
-            if(mode === 'print') {
-                preparePrint("REKAP NILAI AKHIR", "KATEGORI: " + gender.toUpperCase());
-                document.getElementById('printContent').innerHTML = h;
-                window.print();
-            } else {
-                downloadExcel(h, `Rekap_${gender}.xls`);
+            } catch (err) {
+                statusDot.className = "w-3 h-3 bg-red-500 rounded-full shadow";
             }
         }
 
-        function downloadExcel(html, name) {
-            let link = document.createElement('a');
-            link.href = 'data:application/vnd.ms-excel,' + encodeURIComponent(html);
-            link.download = name;
-            link.click();
+        // UI HELPERS
+        function updateQueueUI() {
+            let count = queue.length;
+            let badge = document.getElementById('queueBadge');
+            document.getElementById('queueCount').innerText = count;
+            count > 0 ? badge.classList.remove('hidden') : badge.classList.add('hidden');
         }
 
-        function preparePrint(title, cat) {
-            document.getElementById('printTitle').innerText = title;
-            document.getElementById('printCategory').innerText = cat;
-            document.getElementById('printDate').innerText = new Date().toLocaleString();
-            document.getElementById('printContent').innerHTML = "";
+        function renderHistoryFromStorage() {
+             let list = document.getElementById('historyList');
+             list.innerHTML = "";
+             
+             sessionHistory.forEach(item => {
+                let statusBadge = item.status === 'pending' 
+                    ? '<span class="text-orange-400 flex items-center gap-1">Antri...</span>' 
+                    : '<span class="text-green-600 flex items-center gap-1 font-bold">Terkirim <i data-lucide="check-circle" class="w-4 h-4"></i></span>';
+                
+                let div = document.createElement('div');
+                div.className = "bg-white p-4 rounded-xl border border-gray-100 flex justify-between items-center text-sm shadow-sm mb-2";
+                
+                let html = '<div class="flex items-center gap-3">';
+                html += '<div class="bg-gray-100 w-10 h-10 rounded-lg flex items-center justify-center font-bold text-gray-600 text-xs border border-gray-200">' + item.idBarung + '</div>';
+                html += '<div><div class="font-bold text-gray-700 text-sm">' + item.namaBarung + '</div>';
+                html += '<div class="text-[10px] text-gray-400 flex items-center gap-1"><i data-lucide="clock" class="w-3 h-3"></i> ' + item.timestamp + '</div></div></div>';
+                html += '<div class="text-right"><div class="font-black text-blue-600 text-xl">' + item.nilai + '</div>';
+                html += '<div class="text-[10px] text-gray-400 flex justify-end mt-1">' + statusBadge + '</div></div>';
+                
+                div.innerHTML = html;
+                list.appendChild(div);
+             });
+             
+             document.getElementById('histCount').innerText = sessionHistory.length;
+             lucide.createIcons();
         }
 
-        // --- OTHER PRINTS ---
-        async function printKlasemen(g) {
-            if(!confirm("Cetak?")) return;
-            const r = await fetch(API_URL + "?action=getKlasemen");
-            const j = await r.json();
-            let d = j.data.filter(x => getSafeGender(x[0]).toLowerCase().includes(g.toLowerCase()));
-            preparePrint("KLASEMEN", g.toUpperCase());
-            let h = `<table style="width:100%;border:1px solid #000;border-collapse:collapse;"><thead><tr style="background:#eee;"><th>RANK</th><th>BARUNG</th><th>TOTAL</th></tr></thead><tbody>`;
-            d.forEach((x,i) => h += `<tr><td style="text-align:center;border:1px solid #000;">${i+1}</td><td style="border:1px solid #000;">${x[0]}</td><td style="text-align:right;border:1px solid #000;">${x[2]}</td></tr>`);
-            h += `</tbody></table>`;
-            document.getElementById('printContent').innerHTML = h;
-            window.print();
-        }
-
-        function printRekapTaman() {
-            let t = document.getElementById('selectTamanPrint').value;
-            if(!t) return alert("Pilih Taman");
-            preparePrint("REKAP TAMAN", t);
-            let d = rawData.filter(x => x[1] === t).sort((a,b) => b[4]-a[4]);
-            let h = `<table style="width:100%;border:1px solid #000;border-collapse:collapse;"><thead><tr><th>NO</th><th>BARUNG</th><th>NILAI</th></tr></thead><tbody>`;
-            d.forEach((x,i) => h += `<tr><td style="text-align:center;border:1px solid #000;">${i+1}</td><td style="border:1px solid #000;">${x[2]}</td><td style="border:1px solid #000;">${x[4]}</td></tr>`);
-            h += `</tbody></table>`;
-            document.getElementById('printContent').innerHTML = h;
-            window.print();
-        }
-
-        function printRaporBarung() {
-            let b = document.getElementById('selectBarungPrint').value;
-            if(!b) return alert("Pilih Barung");
-            preparePrint("RAPOR", b);
-            let d = rawData.filter(x => x[2] === b);
-            let h = `<table style="width:100%;border:1px solid #000;border-collapse:collapse;"><thead><tr><th>TAMAN</th><th>NILAI</th></tr></thead><tbody>`;
-            let tot = 0;
-            d.forEach(x => { tot+=parseInt(x[4]); h += `<tr><td style="border:1px solid #000;">${x[1]}</td><td style="border:1px solid #000;">${x[4]}</td></tr>`; });
-            h += `<tr><td><b>TOTAL</b></td><td><b>${tot}</b></td></tr></tbody></table>`;
-            document.getElementById('printContent').innerHTML = h;
-            window.print();
-        }
-
-        // --- UTILS ---
-        function switchTab(t) {
-            document.getElementById('tab-monitor').classList.add('hidden');
-            document.getElementById('tab-laporan').classList.add('hidden');
-            document.getElementById('tab-'+t).classList.remove('hidden');
-        }
-
-        async function hapusData(k) {
-            if(!confirm("Hapus?")) return;
-            await fetch(API_URL, {method:'POST', mode:'no-cors', body:JSON.stringify({action:'delete', password:PASSWORD, kunci:k})});
-            alert("Dihapus"); loadAllData();
-        }
-
-        async function resetAllData() {
-            if(prompt("Ketik RESET") === "RESET") {
-                await fetch(API_URL, {method:'POST', mode:'no-cors', body:JSON.stringify({action:'reset', password:PASSWORD})});
-                location.reload();
-            }
+        function doLogout() {
+            Swal.fire({
+                title: 'Keluar?', text: "Riwayat sesi ini akan dihapus.", icon: 'warning',
+                showCancelButton: true, confirmButtonColor: '#ef4444', cancelButtonColor: '#334155', confirmButtonText: 'Ya, Logout'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    localStorage.removeItem('scout_session');
+                    localStorage.removeItem('scout_assessed');
+                    localStorage.removeItem('scout_history'); 
+                    location.reload();
+                }
+            });
         }
     </script>
 </body>
