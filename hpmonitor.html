@@ -121,7 +121,7 @@
 
         async function fetchData() {
             try {
-                // 1. Master Data (Cache Logic simple)
+                // 1. Master Data (Untuk cek Gender dan No Undi)
                 if(masterBarung.length === 0) {
                     const resM = await fetch(API_URL + "?action=getData");
                     const jsonM = await resM.json();
@@ -133,11 +133,11 @@
                 const json = await res.json();
                 
                 if(json.status === "success") {
-                    rawData = json.data; // Simpan data mentah
-                    renderData(); // Render sesuai tab aktif
+                    rawData = json.data; 
+                    renderData(); 
                     
                     const d = new Date();
-                    document.getElementById('lastUpdate').innerText = "Last Update: " + d.toLocaleTimeString();
+                    document.getElementById('lastUpdate').innerText = "Last Update: " + d.toLocaleTimeString('id-ID');
                 }
 
             } catch(e) { console.error("Sync Error:", e); }
@@ -146,7 +146,6 @@
         function switchTab(tab) {
             activeTab = tab;
             
-            // Update Style Tombol
             const btnPutra = document.getElementById('tabPutra');
             const btnPutri = document.getElementById('tabPutri');
             
@@ -165,7 +164,6 @@
             const container = document.getElementById('containerList');
             container.innerHTML = "";
 
-            // Filter Data Sesuai Tab
             let filtered = [];
             rawData.forEach(row => {
                 let gender = getSafeGender(row[0]);
@@ -184,16 +182,20 @@
                 return;
             }
 
-            // Render List (Mobile Card Style)
             filtered.forEach((row, index) => {
                 let rank = index + 1;
-                let rankClass = "bg-slate-800 border border-slate-700"; // Default styling
-                let rankBadge = `
-                    <div class="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center font-bold text-slate-300 text-sm">
-                        ${rank}
-                    </div>`;
                 
-                // Styling Khusus Juara 1, 2, 3
+                // Cari Nomor Undi dari masterBarung
+                let bInfo = masterBarung.find(b => b[1] === row[0]);
+                let noUndi = bInfo ? bInfo[0] : "-";
+
+                // Format Nilai (Menampilkan 1 desimal jika ada Trik Draw)
+                let rawScore = parseFloat(row[2]) || 0;
+                let displayScore = rawScore % 1 !== 0 ? rawScore.toFixed(1) : rawScore;
+
+                let rankClass = "bg-slate-800 border border-slate-700"; 
+                let rankBadge = `<div class="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center font-bold text-slate-300 text-sm">${rank}</div>`;
+                
                 if(rank === 1) {
                     rankClass = "rank-1 bg-slate-800/50 border-t border-r border-b border-slate-700";
                     rankBadge = `<div class="w-8 h-8 rounded-full bg-yellow-500 text-slate-900 flex items-center justify-center font-bold shadow-lg shadow-yellow-500/50">1</div>`;
@@ -212,10 +214,10 @@
                         </div>
                         <div class="flex-1 min-w-0">
                             <h3 class="font-bold text-white text-base truncate">${row[0]}</h3>
-                            <p class="text-xs text-slate-400 truncate uppercase tracking-wider">${row[1]}</p>
+                            <p class="text-[11px] text-slate-400 truncate uppercase tracking-wider">NO. ${noUndi} • ${row[1]}</p>
                         </div>
                         <div class="text-right">
-                            <div class="font-display font-bold text-2xl text-white tracking-tight">${row[2]}</div>
+                            <div class="font-display font-bold text-2xl text-white tracking-tight">${displayScore}</div>
                             <div class="text-[10px] text-slate-500 font-bold uppercase">Poin</div>
                         </div>
                     </div>
@@ -224,9 +226,6 @@
             });
             lucide.createIcons();
         }
-        
-        // Init Tab Style
-        switchTab('putra');
     </script>
 </body>
 </html>
