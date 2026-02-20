@@ -104,6 +104,23 @@
             </div>
 
             <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="p-4 border-b bg-indigo-50 flex justify-between items-center">
+                    <div>
+                        <h3 class="font-bold text-indigo-900 flex items-center gap-2"><i data-lucide="table"></i> Matriks Keseluruhan (Live)</h3>
+                        <p class="text-xs text-indigo-600 mt-1">Pantau seluruh nilai per pos</p>
+                    </div>
+                    <select id="matrixLiveFilter" onchange="renderLiveMatrix()" class="p-2 border border-indigo-200 rounded-lg text-xs font-bold bg-white text-indigo-800 outline-none">
+                        <option value="Putra">Kategori PUTRA</option>
+                        <option value="Putri">Kategori PUTRI</option>
+                    </select>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-xs text-left border-collapse" id="liveMatrixTable">
+                        </table>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
                 <div class="p-4 border-b bg-slate-50 flex justify-between items-center">
                     <h3 class="font-bold flex items-center gap-2"><i data-lucide="list"></i> Log Input Terakhir</h3>
                 </div>
@@ -121,18 +138,18 @@
                     <div class="bg-purple-200 p-2 rounded-lg"><i data-lucide="table" class="w-6 h-6 text-purple-700"></i></div>
                     <div>
                         <h3 class="font-bold text-lg text-purple-900">Matriks Rekapitulasi</h3>
-                        <p class="text-xs text-purple-600">Download Excel Murni (.xlsx) / Cetak PDF</p>
+                        <p class="text-xs text-purple-600">Format Resmi (No Undi & Ranking di Kanan)</p>
                     </div>
                 </div>
                 <div class="space-y-2">
                     <div class="flex gap-2 items-center">
                         <span class="text-xs font-bold w-12 text-slate-500">PUTRA:</span>
-                        <button onclick="processRekap('Putra', 'print')" class="flex-1 bg-purple-700 text-white py-2 rounded-lg font-bold hover:bg-purple-800 flex items-center justify-center gap-2 text-xs"><i data-lucide="printer" class="w-3 h-3"></i> PDF</button>
+                        <button onclick="processRekap('Putra', 'print')" class="flex-1 bg-purple-700 text-white py-2 rounded-lg font-bold hover:bg-purple-800 flex items-center justify-center gap-2 text-xs"><i data-lucide="printer" class="w-3 h-3"></i> Cetak PDF</button>
                         <button onclick="processRekap('Putra', 'excel')" class="flex-1 bg-green-600 text-white py-2 rounded-lg font-bold hover:bg-green-700 flex items-center justify-center gap-2 text-xs"><i data-lucide="file-spreadsheet" class="w-3 h-3"></i> Excel (.xlsx)</button>
                     </div>
                     <div class="flex gap-2 items-center">
                         <span class="text-xs font-bold w-12 text-slate-500">PUTRI:</span>
-                        <button onclick="processRekap('Putri', 'print')" class="flex-1 bg-purple-700 text-white py-2 rounded-lg font-bold hover:bg-purple-800 flex items-center justify-center gap-2 text-xs"><i data-lucide="printer" class="w-3 h-3"></i> PDF</button>
+                        <button onclick="processRekap('Putri', 'print')" class="flex-1 bg-purple-700 text-white py-2 rounded-lg font-bold hover:bg-purple-800 flex items-center justify-center gap-2 text-xs"><i data-lucide="printer" class="w-3 h-3"></i> Cetak PDF</button>
                         <button onclick="processRekap('Putri', 'excel')" class="flex-1 bg-green-600 text-white py-2 rounded-lg font-bold hover:bg-green-700 flex items-center justify-center gap-2 text-xs"><i data-lucide="file-spreadsheet" class="w-3 h-3"></i> Excel (.xlsx)</button>
                     </div>
                 </div>
@@ -141,7 +158,7 @@
             <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
                 <div class="flex items-center gap-3 mb-4">
                     <div class="bg-yellow-100 p-2 rounded-lg"><i data-lucide="trophy" class="w-6 h-6 text-yellow-600"></i></div>
-                    <div><h3 class="font-bold text-lg">Cetak Juara</h3></div>
+                    <div><h3 class="font-bold text-lg">Cetak Klasemen Juara</h3></div>
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <button onclick="printKlasemen('Putra')" class="bg-slate-800 text-white py-2 rounded-lg font-bold hover:bg-slate-700 gap-2 flex justify-center items-center text-sm"><i data-lucide="printer" class="w-4 h-4"></i> JUARA PUTRA</button>
@@ -151,9 +168,9 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
-                    <div class="flex items-center gap-2 mb-2"><i data-lucide="tent" class="w-5 h-5 text-blue-600"></i><h3 class="font-bold text-sm uppercase">Rekap Per Taman</h3></div>
+                    <div class="flex items-center gap-2 mb-2"><i data-lucide="tent" class="w-5 h-5 text-blue-600"></i><h3 class="font-bold text-sm uppercase">Rekap Nilai Per Pos</h3></div>
                     <div class="flex gap-2">
-                        <select id="selectTamanPrint" class="flex-1 p-2 border rounded bg-slate-50 text-xs font-bold"><option value="">Pilih Taman...</option></select>
+                        <select id="selectTamanPrint" class="flex-1 p-2 border rounded bg-slate-50 text-xs font-bold"><option value="">Pilih Pos / Taman...</option></select>
                         <button onclick="printRekapTaman()" class="bg-blue-600 text-white px-3 rounded hover:bg-blue-700"><i data-lucide="printer" class="w-4 h-4"></i></button>
                     </div>
                 </div>
@@ -202,20 +219,15 @@
 
         function checkLogin() {
             var pass = document.getElementById('adminPass').value;
-            if(!pass) { 
-                Swal.fire('Oops', 'Masukkan Password dulu!', 'error'); 
-                return; 
-            }
+            if(!pass) { Swal.fire('Oops', 'Masukkan Password!', 'error'); return; }
             PASSWORD = pass;
             document.getElementById('loginOverlay').classList.add('hidden');
             loadAllData();
             setInterval(loadAllData, 30000);
-            Swal.fire({icon:'success', title:'Login Berhasil', timer:1500, showConfirmButton:false});
+            Swal.fire({icon:'success', title:'Login Berhasil', timer:1000, showConfirmButton:false});
         }
 
-        function logout() { 
-            location.reload(); 
-        }
+        function logout() { location.reload(); }
 
         function getSafeGender(namaBarung) {
             var info = masterBarung.find(function(b) { return b[1] == namaBarung; });
@@ -223,9 +235,41 @@
             return "?"; 
         }
 
+        // --- PUSAT DATA CALCULATOR (Super Engine) ---
+        // Fungsi ini digunakan oleh Live Matrix, Cetak PDF, Excel, dan Top 5.
+        function getMatrixData(gender) {
+            var barungs = masterBarung.filter(function(b) {
+                var g = b[3] ? String(b[3]) : "?"; 
+                return g.toLowerCase().includes(gender.toLowerCase());
+            });
+            var tamans = masterTaman.map(function(t) { return t[1]; }).sort();
+            
+            var finalData = barungs.map(function(b) {
+                var scores = {};
+                tamans.forEach(function(t) { scores[t] = 0; });
+                var total = 0;
+                
+                rawData.forEach(function(r) {
+                    if(r[2] === b[1]) { scores[r[1]] = parseFloat(r[4]) || 0; } // pakai parseFloat agar support trik desimal
+                });
+                
+                total = Object.values(scores).reduce(function(a,c) { return a+c; }, 0);
+                
+                // Pembulatan aman untuk tampilan total jika ada koma trik draw
+                var displayTotal = total % 1 !== 0 ? total.toFixed(1) : total;
+
+                return { noBarung: b[0], nama: b[1], pangkalan: b[2], scores: scores, total: total, displayTotal: displayTotal };
+            });
+
+            finalData.sort(function(a,b) { return b.total - a.total; });
+            return { tamans: tamans, data: finalData };
+        }
+
+        // --- LOAD SEMUA DATA ---
         async function loadAllData() {
             document.getElementById('lastUpdate').innerText = "Memuat...";
             try {
+                // 1. Data Master
                 const resMaster = await fetch(API_URL + "?action=getData");
                 const jsonMaster = await resMaster.json();
                 if(jsonMaster.status === "success") {
@@ -233,23 +277,26 @@
                      masterBarung = jsonMaster.data.barung;
                      renderDropdownPrint();
                 }
+
+                // 2. Data Nilai Raw
                 const resAdmin = await fetch(API_URL + "?action=getAdminData");
                 const jsonAdmin = await resAdmin.json();
                 if(jsonAdmin.status === "success") {
                     rawData = jsonAdmin.data; 
                     renderStatsAndLog(rawData);
                 }
-                const resKlasemen = await fetch(API_URL + "?action=getKlasemen");
-                const jsonKlasemen = await resKlasemen.json();
-                if(jsonKlasemen.status === "success") {
-                    renderLiveKlasemen(jsonKlasemen.data);
+
+                // 3. Render Komponen Live dari Data yg Diolah
+                if(masterBarung.length > 0 && masterTaman.length > 0) {
+                    renderLiveKlasemenLocal();
+                    renderLiveMatrix();
                 }
+
                 document.getElementById('lastUpdate').innerText = new Date().toLocaleTimeString();
-            } catch(e) { 
-                console.error("Error loading data"); 
-            }
+            } catch(e) { console.error("Error loading data"); }
         }
 
+        // --- UI RENDERERS ---
         function renderStatsAndLog(data) {
             document.getElementById('totalData').innerText = data.length;
             var tamanSet = new Set(data.map(function(r) { return r[1]; }));
@@ -282,25 +329,18 @@
             lucide.createIcons();
         }
 
-        function renderLiveKlasemen(data) {
-            var putraArr = []; 
-            var putriArr = [];
-            data.forEach(function(row) {
-                var genderStr = getSafeGender(row[0]);
-                if(genderStr.toLowerCase().includes("putra")) {
-                    putraArr.push(row);
-                } else if(genderStr.toLowerCase().includes("putri")) {
-                    putriArr.push(row);
-                }
-            });
-            fillTable('livePutra', putraArr); 
-            fillTable('livePutri', putriArr);
+        function renderLiveKlasemenLocal() {
+            var dataPa = getMatrixData('Putra').data;
+            var dataPi = getMatrixData('Putri').data;
+            
+            fillTable('livePutra', dataPa); 
+            fillTable('livePutri', dataPi);
         }
 
-        function fillTable(elementId, data) {
+        function fillTable(elementId, dataArr) {
             var tbody = document.getElementById(elementId);
             tbody.innerHTML = "";
-            var top5 = data.slice(0, 5);
+            var top5 = dataArr.slice(0, 5);
             if(top5.length === 0) { 
                 tbody.innerHTML = '<tr><td colspan="3" class="p-4 text-center text-xs text-slate-400">Belum ada data</td></tr>'; 
                 return; 
@@ -308,19 +348,56 @@
             top5.forEach(function(row, idx) {
                 var tr = '<tr class="border-b border-slate-50 last:border-0 hover:bg-slate-50">';
                 tr += '<td class="p-3 text-center font-bold text-slate-400 text-xs">' + (idx+1) + '</td>';
-                tr += '<td class="p-3"><div class="font-bold text-sm text-slate-700">' + row[0] + '</div><div class="text-[10px] text-slate-400">' + row[1] + '</div></td>';
-                tr += '<td class="p-3 text-right font-bold text-blue-600 text-sm">' + row[2] + '</td>';
+                tr += '<td class="p-3"><div class="font-bold text-sm text-slate-700">' + row.nama + '</div><div class="text-[10px] text-slate-400">No. ' + row.noBarung + '</div></td>';
+                tr += '<td class="p-3 text-right font-bold text-blue-600 text-sm">' + row.displayTotal + '</td>';
                 tr += '</tr>';
                 tbody.innerHTML += tr;
             });
         }
 
+        function renderLiveMatrix() {
+            var gender = document.getElementById('matrixLiveFilter').value;
+            var matrix = getMatrixData(gender);
+            var tamans = matrix.tamans;
+            var data = matrix.data;
+            
+            var table = document.getElementById('liveMatrixTable');
+            
+            if(data.length === 0) {
+                table.innerHTML = '<tr><td class="p-4 text-center text-slate-500">Belum ada data barung masuk.</td></tr>';
+                return;
+            }
+
+            // Header (Posisinya RANGKING di ujung Kanan)
+            var h = '<thead><tr class="bg-indigo-100 text-indigo-900 border-b border-indigo-200">';
+            h += '<th class="p-2 border-r border-indigo-200 text-center w-12">NO</th>';
+            h += '<th class="p-2 border-r border-indigo-200">BARUNG / PANGKALAN</th>';
+            tamans.forEach(function(t) { h += '<th class="p-2 border-r border-indigo-200 text-center" title="'+t+'">' + t.substring(0,8) + '.</th>'; });
+            h += '<th class="p-2 border-r border-indigo-200 text-center bg-indigo-200">TOTAL</th>';
+            h += '<th class="p-2 text-center bg-yellow-100 text-yellow-800">RANK</th></tr></thead><tbody class="divide-y divide-slate-100">';
+            
+            // Body
+            data.forEach(function(row, i) {
+                h += '<tr class="hover:bg-slate-50">';
+                h += '<td class="p-2 text-center font-bold text-slate-500 border-r border-slate-100">' + row.noBarung + '</td>';
+                h += '<td class="p-2 border-r border-slate-100"><div class="font-bold text-slate-700">' + row.nama + '</div><div class="text-[10px] text-slate-400">' + row.pangkalan + '</div></td>';
+                tamans.forEach(function(t) { 
+                    var val = row.scores[t] === 0 ? '<span class="text-slate-300">-</span>' : row.scores[t];
+                    h += '<td class="p-2 text-center border-r border-slate-100">' + val + '</td>'; 
+                });
+                h += '<td class="p-2 text-center font-bold text-blue-600 border-r border-slate-100 bg-blue-50/30">' + row.displayTotal + '</td>';
+                h += '<td class="p-2 text-center font-black text-lg text-slate-800 bg-yellow-50/50">' + (i+1) + '</td>';
+                h += '</tr>';
+            });
+            h += '</tbody>';
+            table.innerHTML = h;
+        }
+
+        // --- PRINT & EXCEL LOGIC ---
         function renderDropdownPrint() {
             var selTaman = document.getElementById('selectTamanPrint');
             selTaman.innerHTML = '<option value="">Pilih Taman...</option>';
-            masterTaman.forEach(function(t) { 
-                selTaman.innerHTML += '<option value="' + t[1] + '">' + t[1] + '</option>'; 
-            });
+            masterTaman.forEach(function(t) { selTaman.innerHTML += '<option value="' + t[1] + '">' + t[1] + '</option>'; });
             
             var selBarung = document.getElementById('selectBarungPrint');
             selBarung.innerHTML = '<option value="">Pilih Barung...</option>';
@@ -334,110 +411,91 @@
         function preparePrint(title, category) {
             document.getElementById('printTitle').innerText = title;
             document.getElementById('printCategory').innerText = category;
-            var now = new Date();
-            document.getElementById('printDate').innerText = now.toLocaleString('id-ID');
-            document.getElementById('printDateSign').innerText = now.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            document.getElementById('printDate').innerText = new Date().toLocaleString('id-ID');
+            document.getElementById('printDateSign').innerText = new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
             document.getElementById('printContent').innerHTML = "";
         }
 
         async function processRekap(gender, mode) {
-            const res = await Swal.fire({title:'Rekap ' + gender + '?', icon:'question', showCancelButton:true});
+            const res = await Swal.fire({title:'Proses Matriks ' + gender + '?', icon:'question', showCancelButton:true});
             if(!res.isConfirmed) return;
 
-            var barungs = masterBarung.filter(function(b) {
-                var g = b[3] ? String(b[3]) : "?"; 
-                return g.toLowerCase().includes(gender.toLowerCase());
-            });
-
-            if(barungs.length === 0) { 
-                Swal.fire('Kosong', 'Tidak ada data barung', 'warning'); 
-                return; 
-            }
+            var matrix = getMatrixData(gender);
+            if(matrix.data.length === 0) { Swal.fire('Kosong', 'Tidak ada data.', 'warning'); return; }
             
-            var tamans = masterTaman.map(function(t) { return t[1]; }).sort();
-            
-            var finalData = barungs.map(function(b) {
-                var scores = {};
-                tamans.forEach(function(t) { scores[t] = 0; });
-                var total = 0;
-                
-                rawData.forEach(function(r) {
-                    if(r[2] === b[1]) { 
-                        scores[r[1]] = parseInt(r[4]) || 0; 
-                    }
-                });
-                
-                total = Object.values(scores).reduce(function(a,c) { return a+c; }, 0);
-                return { nama: b[1], pangkalan: b[2], scores: scores, total: total };
-            });
-
-            finalData.sort(function(a,b) { return b.total - a.total; });
+            var tamans = matrix.tamans;
+            var finalData = matrix.data;
 
             if(mode === 'print') {
-                var h = '<table border="1" style="border-collapse:collapse;width:100%;font-family:Arial;font-size:12px;">';
-                h += '<thead style="background:#ddd;"><tr><th>RANK</th><th>NO</th><th>BARUNG</th><th>PANGKALAN</th>';
+                var h = '<table border="1" style="border-collapse:collapse;width:100%;font-family:Arial;font-size:11px;">';
+                h += '<thead style="background:#ddd;"><tr><th style="width:30px;">NO</th><th>BARUNG</th><th>PANGKALAN</th>';
                 tamans.forEach(function(t) { h += '<th>' + t + '</th>'; });
-                h += '<th>TOTAL</th></tr></thead><tbody>';
+                h += '<th>TOTAL</th><th style="width:40px;">RANGKING</th></tr></thead><tbody>';
                 
                 finalData.forEach(function(row, i) {
                     h += '<tr>';
-                    h += '<td style="text-align:center;">' + (i+1) + '</td>';
-                    h += '<td style="text-align:center;">' + (i+1) + '</td>';
+                    h += '<td style="text-align:center;">' + row.noBarung + '</td>';
                     h += '<td>' + row.nama + '</td>';
                     h += '<td>' + row.pangkalan + '</td>';
                     tamans.forEach(function(t) { 
                         var val = row.scores[t] || '-';
                         h += '<td style="text-align:center;">' + val + '</td>'; 
                     });
-                    h += '<td style="text-align:center;font-weight:bold;">' + row.total + '</td>';
+                    h += '<td style="text-align:center;font-weight:bold;">' + row.displayTotal + '</td>';
+                    h += '<td style="text-align:center;font-weight:bold;font-size:12px;">' + (i+1) + '</td>';
                     h += '</tr>';
                 });
                 h += '</tbody></table>';
 
-                preparePrint("REKAP NILAI AKHIR", "KATEGORI: " + gender.toUpperCase());
+                preparePrint("MATRIKS REKAPITULASI NILAI AKHIR", "KATEGORI: " + gender.toUpperCase());
                 document.getElementById('printContent').innerHTML = h;
                 window.print();
             } 
             else if (mode === 'excel') {
                 try {
-                    var header = ['RANGKING', 'NO', 'NAMA BARUNG', 'PANGKALAN'];
+                    // Header (RANGKING ditaruh paling kanan)
+                    var header = ['NO UNDI', 'NAMA BARUNG', 'PANGKALAN'];
                     tamans.forEach(function(t) { header.push(t); });
                     header.push('TOTAL NILAI');
+                    header.push('RANGKING');
                     
                     var dataRows = finalData.map(function(row, index) {
-                        var rowData = [index + 1, index + 1, row.nama, row.pangkalan];
+                        var rowData = [row.noBarung, row.nama, row.pangkalan];
                         tamans.forEach(function(t) { rowData.push(row.scores[t] || 0); });
-                        rowData.push(row.total);
+                        rowData.push(row.displayTotal);
+                        rowData.push(index + 1);
                         return rowData;
                     });
                     
                     var fullArray = [header].concat(dataRows);
-                    
                     var ws = XLSX.utils.aoa_to_sheet(fullArray);
                     var wb = XLSX.utils.book_new();
                     XLSX.utils.book_append_sheet(wb, ws, "Rekap " + gender);
+                    XLSX.writeFile(wb, "Rekap_Nilai_" + gender + "_Asli.xlsx");
                     
-                    XLSX.writeFile(wb, "Rekap_Nilai_" + gender + ".xlsx");
                 } catch(err) {
-                    Swal.fire('Error', 'Gagal membuat Excel.', 'error');
+                    Swal.fire('Error', 'Gagal membuat file Excel. Pastikan internet menyala.', 'error');
                 }
             }
         }
 
-        async function printKlasemen(g) {
-            if(!confirm("Cetak?")) return;
-            const r = await fetch(API_URL + "?action=getKlasemen");
-            const j = await r.json();
-            var d = j.data.filter(function(x) { return getSafeGender(x[0]).toLowerCase().includes(g.toLowerCase()); });
-            preparePrint("KLASEMEN", g.toUpperCase());
+        // Cetak Juara (Sudah pakai getMatrixData agar akurat)
+        function printKlasemen(g) {
+            var matrix = getMatrixData(g);
+            if(matrix.data.length === 0) return alert("Kosong");
             
-            var h = '<table style="width:100%;border:1px solid #000;border-collapse:collapse;">';
-            h += '<thead><tr style="background:#eee;"><th>RANK</th><th>BARUNG</th><th>TOTAL</th></tr></thead><tbody>';
-            d.forEach(function(x,i) { 
-                h += '<tr>';
-                h += '<td style="text-align:center;border:1px solid #000;">' + (i+1) + '</td>';
-                h += '<td style="border:1px solid #000;">' + x[0] + '</td>';
-                h += '<td style="text-align:right;border:1px solid #000;">' + x[2] + '</td>';
+            preparePrint("KLASEMEN AKHIR JUARA", "KATEGORI " + g.toUpperCase());
+            var h = '<table style="width:100%;border:1px solid #000;border-collapse:collapse;font-size:14px;">';
+            h += '<thead><tr style="background:#eee;"><th>RANK</th><th>NO UNDI</th><th>BARUNG</th><th>PANGKALAN</th><th>TOTAL NILAI</th></tr></thead><tbody>';
+            
+            matrix.data.forEach(function(x,i) { 
+                var bg = i < 3 ? "background:#fefce8;" : ""; // Highlight top 3
+                h += '<tr style="'+bg+'">';
+                h += '<td style="text-align:center;border:1px solid #000;font-weight:bold;font-size:16px;">' + (i+1) + '</td>';
+                h += '<td style="text-align:center;border:1px solid #000;">' + x.noBarung + '</td>';
+                h += '<td style="border:1px solid #000;font-weight:bold;">' + x.nama + '</td>';
+                h += '<td style="border:1px solid #000;">' + x.pangkalan + '</td>';
+                h += '<td style="text-align:center;border:1px solid #000;font-weight:bold;font-size:16px;">' + x.displayTotal + '</td>';
                 h += '</tr>'; 
             });
             h += '</tbody></table>';
@@ -448,16 +506,23 @@
         function printRekapTaman() {
             var t = document.getElementById('selectTamanPrint').value;
             if(!t) return alert("Pilih Taman");
-            preparePrint("REKAP TAMAN", t);
+            preparePrint("REKAPITULASI NILAI POS", t.toUpperCase());
+            
             var d = rawData.filter(function(x) { return x[1] === t; }).sort(function(a,b) { return b[4]-a[4]; });
             
             var h = '<table style="width:100%;border:1px solid #000;border-collapse:collapse;">';
-            h += '<thead><tr><th>NO</th><th>BARUNG</th><th>NILAI</th></tr></thead><tbody>';
+            h += '<thead><tr style="background:#eee;"><th>RANGKING</th><th>NO UNDI</th><th>BARUNG</th><th>PANGKALAN</th><th>NILAI</th></tr></thead><tbody>';
             d.forEach(function(x,i) { 
+                var bInfo = masterBarung.find(function(b) { return b[1] == x[2]; });
+                var noUndi = bInfo ? bInfo[0] : "-";
+                var pang = bInfo ? bInfo[2] : "-";
+                
                 h += '<tr>';
-                h += '<td style="text-align:center;border:1px solid #000;">' + (i+1) + '</td>';
+                h += '<td style="text-align:center;border:1px solid #000;font-weight:bold;">' + (i+1) + '</td>';
+                h += '<td style="text-align:center;border:1px solid #000;">' + noUndi + '</td>';
                 h += '<td style="border:1px solid #000;">' + x[2] + '</td>';
-                h += '<td style="text-align:center;border:1px solid #000;">' + x[4] + '</td>';
+                h += '<td style="border:1px solid #000;">' + pang + '</td>';
+                h += '<td style="text-align:center;border:1px solid #000;font-weight:bold;">' + x[4] + '</td>';
                 h += '</tr>'; 
             });
             h += '</tbody></table>';
@@ -477,19 +542,22 @@
             var total = 0;
             
             var h = '<table style="width:100%;border:1px solid #000;border-collapse:collapse;">';
-            h += '<thead><tr><th>TAMAN</th><th>NILAI</th></tr></thead><tbody>';
-            d.forEach(function(x) { 
-                total += parseInt(x[4]); 
+            h += '<thead><tr style="background:#eee;"><th style="width:50px;">NO</th><th>MATA LOMBA / POS</th><th>NILAI</th></tr></thead><tbody>';
+            d.forEach(function(x, i) { 
+                total += parseFloat(x[4]); 
                 h += '<tr>';
+                h += '<td style="text-align:center;border:1px solid #000;">' + (i+1) + '</td>';
                 h += '<td style="border:1px solid #000;">' + x[1] + '</td>';
                 h += '<td style="text-align:center;border:1px solid #000;">' + x[4] + '</td>';
                 h += '</tr>'; 
             });
-            h += '<tr style="background:#eee;"><td><b>TOTAL</b></td><td style="text-align:center;"><b>' + total + '</b></td></tr></tbody></table>';
+            var tDisplay = total % 1 !== 0 ? total.toFixed(1) : total;
+            h += '<tr style="background:#eee;"><td colspan="2" style="text-align:right;border:1px solid #000;"><b>TOTAL NILAI AKHIR</b></td><td style="text-align:center;border:1px solid #000;font-size:16px;"><b>' + tDisplay + '</b></td></tr></tbody></table>';
             document.getElementById('printContent').innerHTML = h;
             window.print();
         }
 
+        // --- UTILS ---
         function switchTab(t) {
             document.getElementById('tab-monitor').classList.add('hidden');
             document.getElementById('tab-laporan').classList.add('hidden');
@@ -500,30 +568,24 @@
         }
 
         async function hapusData(k) {
-            const res = await Swal.fire({title: 'Hapus Data?', text: "Tidak bisa dikembalikan!", icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', confirmButtonText: 'Ya, Hapus!'});
+            const res = await Swal.fire({title: 'Hapus Data?', text: "Hanya untuk Admin!", icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33'});
             if (!res.isConfirmed) return;
             try {
                 await fetch(API_URL, {method: 'POST', mode: 'no-cors', body: JSON.stringify({action: 'delete', password: PASSWORD, kunci: k})});
                 Swal.fire({icon: 'success', title: 'Terhapus', timer: 1000, showConfirmButton: false});
                 loadAllData();
-            } catch(e) { 
-                Swal.fire('Error', 'Gagal menghapus data', 'error'); 
-            }
+            } catch(e) { Swal.fire('Error', 'Gagal', 'error'); }
         }
 
         async function resetAllData() {
             const res = await Swal.fire({
                 title: 'RESET DATA LOMBA?',
-                text: "Ketik 'RESET' untuk menghapus SEMUA data.",
-                input: 'text',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33'
+                text: "Ketik 'RESET' untuk hapus.",
+                input: 'text', icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33'
             });
-
             if (res.value === 'RESET') {
                 await fetch(API_URL, {method: 'POST', mode: 'no-cors', body: JSON.stringify({action: 'reset', password: PASSWORD})});
-                Swal.fire('Selesai', 'Data berhasil direset', 'success').then(function() { location.reload(); });
+                Swal.fire('Selesai', 'Data direset', 'success').then(function() { location.reload(); });
             }
         }
     </script>
