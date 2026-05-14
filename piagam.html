@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal Piagam Pesta Siaga - Kwarran Selogiri</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            /* Material You Palette - Pramuka Vibe */
+            --md-sys-color-surface: #fdfdf5;
+            --md-sys-color-on-surface: #1a1c18;
+            --md-sys-color-primary-container: #b7f397;
+            --md-sys-color-on-primary-container: #042100;
+            --md-sys-color-secondary-container: #e6e3d5;
+            --glass-bg: rgba(253, 253, 245, 0.75);
+            --border-radius: 24px;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: var(--md-sys-color-surface);
+            color: var(--md-sys-color-on-surface);
+            margin: 0;
+            padding: 0;
+            padding-bottom: 40px;
+        }
+
+        /* Glassmorphism Header & Sticky Filter */
+        .sticky-header {
+            position: sticky;
+            top: 0;
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 16px 24px;
+            z-index: 100;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+        }
+
+        .header-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin: 0 0 16px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .search-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .input-group {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-group i {
+            position: absolute;
+            left: 16px;
+            color: #555;
+            width: 20px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 14px 14px 14px 44px;
+            border: 1px solid var(--md-sys-color-secondary-container);
+            border-radius: 100px;
+            background: white;
+            font-size: 1rem;
+            box-sizing: border-box;
+            outline: none;
+            transition: box-shadow 0.2s;
+        }
+
+        input:focus, select:focus {
+            box-shadow: 0 0 0 2px var(--md-sys-color-primary-container);
+        }
+
+        /* Mobile-First Card Layout */
+        .container {
+            padding: 16px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .grid-layout {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+
+        @media (min-width: 600px) {
+            .grid-layout {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            border: 1px solid rgba(0,0,0,0.03);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .card-name {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .badge-group {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 4px;
+        }
+
+        .badge {
+            background: var(--md-sys-color-secondary-container);
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .badge-barung { background: #ffe0b2; color: #e65100; }
+        .badge-juara { background: #c8e6c9; color: #1b5e20; }
+
+        .btn-download {
+            margin-top: 12px;
+            background: var(--md-sys-color-primary-container);
+            color: var(--md-sys-color-on-primary-container);
+            text-decoration: none;
+            padding: 12px 20px;
+            border-radius: 100px;
+            font-weight: 600;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.2s;
+        }
+
+        .btn-download:hover {
+            background: #a3e280;
+        }
+
+        .loading-state {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .spinner {
+            animation: spin 2s linear infinite;
+        }
+
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+    <div class="sticky-header">
+        <h1 class="header-title">
+            <i data-lucide="award"></i> Portal Piagam Pesta Siaga 2026
+        </h1>
+        <div class="search-container">
+            <div class="input-group">
+                <i data-lucide="search"></i>
+                <input type="text" id="searchInput" placeholder="Cari nama peserta..." onkeyup="filterData()">
+            </div>
+            <div class="input-group">
+                <i data-lucide="school"></i>
+                <select id="gudepFilter" onchange="filterData()">
+                    <option value="all">Semua Gudep / Sekolah</option>
+                    </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div id="loading" class="loading-state">
+            <i data-lucide="loader-2" class="spinner" width="32" height="32"></i>
+            <span>Mengambil data piagam...</span>
+        </div>
+        
+        <div id="cardsContainer" class="grid-layout hidden">
+            </div>
+    </div>
+
+    <script>
+        // INISIALISASI IKON LUCIDE
+        lucide.createIcons();
+
+        // MASUKKAN URL DEPLOYMENT GAS ANDA DI SINI
+        const API_URL = 'https://script.google.com/macros/s/AKfycbxwVsy_NWA53bKROHrygDrjld3WViTZ5O5gf9Oxc_fp9Y3OLeo6Wd8NpjEPuhUc5nbH/exec';
+        let globalData = [];
+
+        async function fetchData() {
+            try {
+                const response = await fetch(API_URL);
+                const data = await response.json();
+                globalData = data;
+                
+                populateGudepFilter(data);
+                renderCards(data);
+                
+                document.getElementById('loading').classList.add('hidden');
+                document.getElementById('cardsContainer').classList.remove('hidden');
+            } catch (error) {
+                document.getElementById('loading').innerHTML = '<span style="color:red">Gagal memuat data. Silakan muat ulang halaman.</span>';
+                console.error("Error fetching data: ", error);
+            }
+        }
+
+        function populateGudepFilter(data) {
+            const select = document.getElementById('gudepFilter');
+            const uniqueGudep = [...new Set(data.map(item => item.GUDEP))].sort();
+            
+            uniqueGudep.forEach(gudep => {
+                if (gudep) {
+                    const option = document.createElement('option');
+                    option.value = gudep;
+                    option.textContent = gudep;
+                    select.appendChild(option);
+                }
+            });
+        }
+
+        function renderCards(data) {
+            const container = document.getElementById('cardsContainer');
+            container.innerHTML = '';
+
+            data.forEach(item => {
+                if (!item.NAMA) return; // Skip baris kosong
+
+                const card = document.createElement('div');
+                card.className = 'card';
+                
+                // Gunakan nama kolom yang tepat dari CSV AutoCrat Anda
+                const linkPDF = item['Merged Doc URL - Piagam Siaga 2026'] || '#';
+                const kategori = item.JUARA === 'PESERTA' ? 'Peserta' : item.JUARA;
+
+                card.innerHTML = `
+                    <h3 class="card-name">${item.NAMA}</h3>
+                    <div style="color: #555; font-size: 0.9rem; margin-top: 4px;">
+                        <i data-lucide="map-pin" style="width: 14px; height: 14px; vertical-align: middle;"></i> ${item.GUDEP}
+                    </div>
+                    <div class="badge-group">
+                        <span class="badge badge-barung">${item.BARUNG}</span>
+                        <span class="badge badge-juara">${kategori}</span>
+                    </div>
+                    <a href="${linkPDF}" target="_blank" class="btn-download">
+                        <i data-lucide="download"></i> Unduh Piagam
+                    </a>
+                `;
+                container.appendChild(card);
+            });
+            lucide.createIcons(); // Re-inisialisasi ikon di dalam kartu baru
+        }
+
+        function filterData() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const selectedGudep = document.getElementById('gudepFilter').value;
+
+            const filtered = globalData.filter(item => {
+                const matchName = item.NAMA && item.NAMA.toLowerCase().includes(searchTerm);
+                const matchGudep = selectedGudep === 'all' || item.GUDEP === selectedGudep;
+                return matchName && matchGudep;
+            });
+
+            renderCards(filtered);
+        }
+
+        // Panggil data saat halaman pertama kali dimuat
+        fetchData();
+    </script>
+</body>
+</html>
